@@ -1,0 +1,17 @@
+server:
+  port: 9010
+spring:
+  application:
+    name: alpaca-blog
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://184.170.209.225:3307/alpaca_blog?charset=utf8mb4&serverTimezone=GMT&useSSL=false&autoReconnect=true
+    username: mysql1
+    password: mysql1pass1230
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  jackson:
+    serialization:
+      indent-output: true

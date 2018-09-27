@@ -9,6 +9,13 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
+/**
+ * 分类
+ *
+ * @author yd
+ */
+@Entity
+@Table(name = "alpaca_blog_category")
 public class CategoryDO implements Serializable {
 
     /**
@@ -29,17 +36,17 @@ public class CategoryDO implements Serializable {
      * 是否可用
      */
     @Column(name = "is_available")
-    private Boolean available;
+    private Boolean available = true;
     /**
      * 是否被删除
      */
     @Column(name = "is_delete")
-    private Boolean delete;
+    private Boolean delete = false;
     /**
      * 乐观锁
      */
     @Version
-    private Long version;
+    private Long version = 1L;
     /**
      * 创建日期
      */
@@ -61,4 +68,99 @@ public class CategoryDO implements Serializable {
     @LastModifiedBy
     private String modifiedBy;
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Boolean getAvailable() {
+        return available;
+    }
+
+    public void setAvailable(Boolean available) {
+        this.available = available;
+    }
+
+    public Boolean getDelete() {
+        return delete;
+    }
+
+    public void setDelete(Boolean delete) {
+        this.delete = delete;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
+
+    public Date getGmtCreated() {
+        return gmtCreated;
+    }
+
+    public void setGmtCreated(Date gmtCreated) {
+        this.gmtCreated = gmtCreated;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Date getGmtModified() {
+        return gmtModified;
+    }
+
+    public void setGmtModified(Date gmtModified) {
+        this.gmtModified = gmtModified;
+    }
+
+    public String getModifiedBy() {
+        return modifiedBy;
+    }
+
+    public void setModifiedBy(String modifiedBy) {
+        this.modifiedBy = modifiedBy;
+    }
+
+    @Override
+    public String toString() {
+        return "CategoryDO{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", available=" + available +
+                ", delete=" + delete +
+                ", version=" + version +
+                ", gmtCreated=" + gmtCreated +
+                ", createdBy='" + createdBy + '\'' +
+                ", gmtModified=" + gmtModified +
+                ", modifiedBy='" + modifiedBy + '\'' +
+                '}';
+    }
 }
