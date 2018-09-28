@@ -1,6 +1,8 @@
 package com.yd1994.alpacablog.dto;
 
+import com.yd1994.alpacablog.common.base.BaseDTO;
 import com.yd1994.alpacablog.entity.ArticleDO;
+import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -10,7 +12,7 @@ import java.util.Date;
  *
  * @author yd
  */
-public class Article implements Serializable {
+public class Article extends BaseDTO<ArticleDO> implements Serializable {
 
     /**
      * ID
@@ -43,7 +45,7 @@ public class Article implements Serializable {
     /**
      * 创建日期
      */
-    private Date ceated;
+    private Date created;
     /**
      * 最后修改日期
      */
@@ -56,20 +58,22 @@ public class Article implements Serializable {
     public Article() {
     }
 
+    /**
+     * 通过 ArticleDO 创建
+     * @param articleDO
+     */
     public Article(ArticleDO articleDO) {
-        this(articleDO.getId(),
-                articleDO.getTitle(),
-                articleDO.getContent(),
-                articleDO.getSummary(),
-                articleDO.getTraffic(),
-                articleDO.getTop(),
-                articleDO.getVersion(),
-                articleDO.getGmtCreated(),
-                articleDO.getGmtModified(),
-                new Category(articleDO.getCategoryDO()));
+        if (articleDO != null) {
+            BeanUtils.copyProperties(articleDO, this);
+            // 时间转换
+            this.created = articleDO.getGmtCreated();
+            this.modified = articleDO.getGmtModified();
+            // 分类转换
+            this.category = new Category(articleDO.getCategoryDO());
+        }
     }
 
-    public Article(Long id, String title, String content, String summary, Long traffic, Boolean top, Long version, Date ceated, Date modified, Category category) {
+    public Article(Long id, String title, String content, String summary, Long traffic, Boolean top, Long version, Date created, Date modified, Category category) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -77,10 +81,25 @@ public class Article implements Serializable {
         this.traffic = traffic;
         this.top = top;
         this.version = version;
-        this.ceated = ceated;
+        this.created = created;
         this.modified = modified;
         this.category = category;
     }
+
+    /**
+     * 转换为 ArticleDO
+     * @return
+     */
+    @Override
+    public ArticleDO toEntity() {
+        ArticleDO articleDO = new ArticleDO();
+        BeanUtils.copyProperties(this, articleDO);
+        articleDO.setGmtCreated(this.getCeated());
+        articleDO.setGmtModified(this.getModified());
+        articleDO.setCategoryDO(this.getCategory().toEntity());
+        return articleDO;
+    }
+
 
     public Long getId() {
         return id;
@@ -139,11 +158,11 @@ public class Article implements Serializable {
     }
 
     public Date getCeated() {
-        return ceated;
+        return created;
     }
 
-    public void setCeated(Date ceated) {
-        this.ceated = ceated;
+    public void setCeated(Date created) {
+        this.created = created;
     }
 
     public Date getModified() {
@@ -172,7 +191,7 @@ public class Article implements Serializable {
                 ", traffic=" + traffic +
                 ", top=" + top +
                 ", version=" + version +
-                ", ceated=" + ceated +
+                ", created=" + created +
                 ", modified=" + modified +
                 ", category=" + category +
                 '}';
