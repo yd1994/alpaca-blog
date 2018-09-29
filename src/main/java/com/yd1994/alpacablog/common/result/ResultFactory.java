@@ -22,7 +22,7 @@ public class ResultFactory implements Serializable {
      * @return Info
      */
     public static Info getSimpleInfo() {
-        return new SimpleResultInfo();
+        return new Info();
     }
 
     /**
@@ -32,7 +32,7 @@ public class ResultFactory implements Serializable {
      * @return Info
      */
     public static Info getInfo(int status) {
-        Info info = new RestResultInfo(status);
+        Info info = new Info(status);
         switch (status) {
             case STATUS_200:
                 info.message(STATUS_200_DEFAULT_MESSAGE);
@@ -65,25 +65,40 @@ public class ResultFactory implements Serializable {
     /**
      * 返回信息
      */
-    public interface Info {
-        Info message(String message);
-    }
+    public static class Info {
 
-    /**
-     * 简单的返回信息
-     *
-     */
-    private static class SimpleResultInfo implements Info {
-
+        /**
+         * 错误码
+         */
+        private int status;
         /**
          * 提示信息
          */
         private String message;
 
-        @Override
+        public Info() {
+        }
+
+        public Info(int status) {
+            this.status = status;
+        }
+
+        public Info(int status, String message) {
+            this.status = status;
+            this.message = message;
+        }
+
         public Info message(String message) {
             this.message = message;
             return this;
+        }
+
+        public int getStatus() {
+            return status;
+        }
+
+        public void setStatus(int status) {
+            this.status = status;
         }
 
         public String getMessage() {
@@ -96,37 +111,11 @@ public class ResultFactory implements Serializable {
 
         @Override
         public String toString() {
-            return "SimpleResultInfo{" +
-                    "message='" + message + '\'' +
+            return "Info{" +
+                    "status=" + status +
+                    ", message='" + message + '\'' +
                     '}';
         }
-    }
-
-    /**
-     * Restful api 使用的返回信息
-     *
-     */
-    private static class RestResultInfo implements Info {
-
-        /**
-         * 错误码
-         */
-        private int status;
-        /**
-         * 提示信息
-         */
-        private String message;
-
-        public RestResultInfo(int status) {
-            this.status = status;
-        }
-
-        @Override
-        public Info message(String message) {
-            this.message = message;
-            return this;
-        }
-
     }
 
 }
