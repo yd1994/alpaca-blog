@@ -10,7 +10,7 @@ spring:
     password: mysql1pass1230
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     show-sql: true
   jackson:
     serialization:

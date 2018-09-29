@@ -1,5 +1,6 @@
 package com.yd1994.alpacablog.service.impl;
 
+import com.yd1994.alpacablog.common.exception.SourceNotFoundException;
 import com.yd1994.alpacablog.dto.Article;
 import com.yd1994.alpacablog.entity.ArticleDO;
 import com.yd1994.alpacablog.repository.ArticleRepository;
@@ -13,6 +14,7 @@ import org.springframework.util.StringUtils;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * ArticleService 实现类
@@ -27,8 +29,13 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public Article get(Long id) {
-        ArticleDO articleDO = this.articleRepository.findById(id).get();
-        return new Article(articleDO);
+        Optional<ArticleDO> optionalArticleDO = this.articleRepository.findById(id);
+        try {
+            ArticleDO articleDO = optionalArticleDO.get();
+            return new Article(articleDO);
+        } catch (NullPointerException e) {
+            throw new SourceNotFoundException("博文：" + id + " 不存在。");
+        }
     }
 
     @Override

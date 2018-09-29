@@ -3,61 +3,130 @@ package com.yd1994.alpacablog.common.result;
 import java.io.Serializable;
 
 /**
- * 简单的信息回馈
+ * 返回信息工厂
  * @author yd
  */
 public class ResultFactory implements Serializable {
 
-    /**
-     * 成功
-     */
-    private final static String SUCCESS = "success";
+    public static final int STATUS_200 = 200;
+
+    private static final String STATUS_200_DEFAULT_MESSAGE = "请求成功。";
+
+    public static final int STATUS_404 = 404;
+
+    private static final String STATUS_404_DEFAULT_MESSAGE = "该资源不存在。";
 
     /**
-     * 失败
+     * 创建 简单的返回信息
+     *
+     * @return Info
      */
-    private final static String ERROR = "error";
+    public static Info getSimpleInfo() {
+        return new SimpleResultInfo();
+    }
 
     /**
-     * 成功时返回信息
+     * 创建 Restful api 使用的返回信息
+     *
+     * @param status 错误码 可通过 ResultFactory.STATUS_* 得到
+     * @return Info
      */
-    public final static Info SIMPLE_SUCCESS_INFO = new SimpleResultInfo(SUCCESS);
+    public static Info getInfo(int status) {
+        Info info = new RestResultInfo(status);
+        switch (status) {
+            case STATUS_200:
+                info.message(STATUS_200_DEFAULT_MESSAGE);
+                break;
+            case STATUS_404:
+                info.message(STATUS_404_DEFAULT_MESSAGE);
+                break;
+        }
+        return info;
+    }
 
     /**
-     * 失败时返回信息
+     * 获取 错误码：200 的返回信息
+     *
+     * @return
      */
-    public final static Info SIMPLE_ERROR_INFO = new SimpleResultInfo(ERROR);
+    public static Info get200Info() {
+        return getInfo(STATUS_200);
+    }
 
+    /**
+     * 获取 错误码：404 的返回信息
+     *
+     * @return
+     */
+    public static Info get404Info() {
+        return getInfo(STATUS_404);
+    }
+
+    /**
+     * 返回信息
+     */
     public interface Info {
+        Info message(String message);
     }
 
     /**
      * 简单的返回信息
      *
-     * @author yd
      */
     private static class SimpleResultInfo implements Info {
 
-        private String info;
+        /**
+         * 提示信息
+         */
+        private String message;
 
-        public SimpleResultInfo(String info) {
-            this.info = info;
+        @Override
+        public Info message(String message) {
+            this.message = message;
+            return this;
         }
 
-        public String getInfo() {
-            return info;
+        public String getMessage() {
+            return message;
         }
 
-        public void setInfo(String info) {
-            this.info = info;
+        public void setMessage(String message) {
+            this.message = message;
         }
 
         @Override
         public String toString() {
-            return "SimpleRestResult{" +
-                    "info='" + info + '\'' +
+            return "SimpleResultInfo{" +
+                    "message='" + message + '\'' +
                     '}';
         }
+    }
+
+    /**
+     * Restful api 使用的返回信息
+     *
+     */
+    private static class RestResultInfo implements Info {
+
+        /**
+         * 错误码
+         */
+        private int status;
+        /**
+         * 提示信息
+         */
+        private String message;
+
+        public RestResultInfo(int status) {
+            this.status = status;
+        }
+
+        @Override
+        public Info message(String message) {
+            this.message = message;
+            return this;
+        }
+
     }
 
 }

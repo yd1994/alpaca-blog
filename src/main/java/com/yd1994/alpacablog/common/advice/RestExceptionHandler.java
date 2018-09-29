@@ -1,15 +1,19 @@
 package com.yd1994.alpacablog.common.advice;
 
+import com.yd1994.alpacablog.common.exception.SourceNotFoundException;
+import com.yd1994.alpacablog.common.result.ResultFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.NativeWebRequest;
 
 /**
  * 异常统一处理
  *
  * @author yd
  */
-@ControllerAdvice
+@RestControllerAdvice
 public class RestExceptionHandler {
 
     /**
@@ -33,6 +37,19 @@ public class RestExceptionHandler {
      */
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    /**
+     * 资源不存在异常 统一处理
+     * 返回 404 错误码
+     * @param request
+     * @param ex
+     * @return
+     */
+    @ExceptionHandler(value = SourceNotFoundException.class)
+    public ResultFactory.Info sourceNotFoundException(NativeWebRequest request, Exception ex) {
+        logger.debug(ex.getMessage());
+        return ResultFactory.get404Info().message(ex.getMessage());
+    }
 
 
 }

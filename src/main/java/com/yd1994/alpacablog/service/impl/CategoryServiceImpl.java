@@ -1,8 +1,7 @@
 package com.yd1994.alpacablog.service.impl;
 
+import com.yd1994.alpacablog.common.exception.SourceNotFoundException;
 import com.yd1994.alpacablog.dto.Category;
-import com.yd1994.alpacablog.entity.ArticleDO;
-import com.yd1994.alpacablog.entity.CategoryArticleDO;
 import com.yd1994.alpacablog.entity.CategoryDO;
 import com.yd1994.alpacablog.repository.CategoryRepository;
 import com.yd1994.alpacablog.service.CategoryService;
@@ -15,6 +14,7 @@ import org.springframework.util.StringUtils;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -24,8 +24,13 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Category get(Long id) {
-        CategoryDO categoryDO = this.categoryRepository.findById(id).get();
-        return new Category(categoryDO);
+        Optional<CategoryDO> optionalCategoryDO = this.categoryRepository.findById(id);
+        try {
+            CategoryDO categoryDO = optionalCategoryDO.get();
+            return new Category(categoryDO);
+        } catch (NullPointerException e) {
+            throw new SourceNotFoundException("分类：" + id + " 不存在。");
+        }
     }
 
     @Override
