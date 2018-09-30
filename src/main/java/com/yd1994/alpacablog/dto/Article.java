@@ -96,7 +96,9 @@ public class Article extends BaseDTO<ArticleDO> implements Serializable {
         BeanUtils.copyProperties(this, articleDO);
         articleDO.setGmtCreated(this.getCeated());
         articleDO.setGmtModified(this.getModified());
-        articleDO.setCategoryDO(this.getCategory().toEntity());
+        if (this.getCategory() != null) {
+            articleDO.setCategoryDO(this.getCategory().toEntity());
+        }
         return articleDO;
     }
 

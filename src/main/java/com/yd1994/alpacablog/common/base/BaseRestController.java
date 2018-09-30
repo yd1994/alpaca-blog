@@ -24,19 +24,19 @@ public abstract class BaseRestController<T, E extends BaseService<T>> {
     @PostMapping
     public ResultFactory.Info add(T t) {
         this.e.add(t);
-        return ResultFactory.get200Info();
+        return ResultFactory.get200Info().message("添加成功成功");
     }
 
     @PutMapping("/{id}")
     public ResultFactory.Info update(T t, @PathVariable Long id) {
         this.e.update(t, id);
-        return ResultFactory.get200Info();
+        return ResultFactory.get200Info().message("修改成功");
     }
 
-    @DeleteMapping("/id")
+    @DeleteMapping("/{id}")
     public ResultFactory.Info delete(@PathVariable Long id) {
         this.e.delete(id);
-        return ResultFactory.get200Info();
+        return ResultFactory.get200Info().message("删除成功");
     }
 
 }

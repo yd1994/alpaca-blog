@@ -12,9 +12,17 @@ public class ResultFactory implements Serializable {
 
     private static final String STATUS_200_DEFAULT_MESSAGE = "请求成功。";
 
+    public static final int STATUS_400 = 400;
+
+    private static final String STATUS_400_DEFAULT_MESSAGE = "请求出错。";
+
     public static final int STATUS_404 = 404;
 
     private static final String STATUS_404_DEFAULT_MESSAGE = "该资源不存在。";
+
+    public static final int STATUS_500 = 500;
+
+    private static final String STATUS_500_DEFAULT_MESSAGE = "服务器异常。";
 
     /**
      * 创建 简单的返回信息
@@ -35,10 +43,16 @@ public class ResultFactory implements Serializable {
         Info info = new Info(status);
         switch (status) {
             case STATUS_200:
-                info.message(STATUS_200_DEFAULT_MESSAGE);
+                info.setMessage(STATUS_200_DEFAULT_MESSAGE);
+                break;
+            case STATUS_400:
+                info.setMessage(STATUS_400_DEFAULT_MESSAGE);
                 break;
             case STATUS_404:
-                info.message(STATUS_404_DEFAULT_MESSAGE);
+                info.setMessage(STATUS_404_DEFAULT_MESSAGE);
+                break;
+            case STATUS_500:
+                info.setMessage(STATUS_500_DEFAULT_MESSAGE);
                 break;
         }
         return info;
@@ -54,12 +68,29 @@ public class ResultFactory implements Serializable {
     }
 
     /**
+     * 获取 错误码：400 的返回信息
+     *
+     * @return
+     */
+    public static Info get400Info() {
+        return getInfo(STATUS_400);
+    }
+
+    /**
      * 获取 错误码：404 的返回信息
      *
      * @return
      */
     public static Info get404Info() {
         return getInfo(STATUS_404);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public static Info get500Info() {
+        return getInfo(STATUS_500);
     }
 
     /**
@@ -88,6 +119,21 @@ public class ResultFactory implements Serializable {
             this.message = message;
         }
 
+        /**
+         * 在提示信息后添加
+         * @param message 提示信息
+         * @return
+         */
+        public Info appendMessage(String message) {
+            this.message += message;
+            return this;
+        }
+
+        /**
+         * 修改提示信息
+         * @param message 提示信息
+         * @return
+         */
         public Info message(String message) {
             this.message = message;
             return this;

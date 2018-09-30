@@ -1,6 +1,7 @@
 package com.yd1994.alpacablog;
 
 import com.yd1994.alpacablog.dto.Article;
+import com.yd1994.alpacablog.entity.ArticleDO;
 import com.yd1994.alpacablog.service.ArticleService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,4 +27,13 @@ public class ArticleServiceTest {
         logger.info(article.toString());
     }
 
+    @Test
+    public void update() {
+        Long id = 1L;
+        Article article = new Article();
+        article.setSummary("test00003");
+        article.setVersion(1L);
+        articleService.update(article, id);
+        logger.info(article.toString());
+    }
 }

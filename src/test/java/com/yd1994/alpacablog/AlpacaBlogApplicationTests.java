@@ -56,9 +56,10 @@ public class AlpacaBlogApplicationTests {
 
     @Test
     public void testArticleRepositoryUpdate() {
-        ArticleDO articleDO = this.articleRepository.getOne(1L);
+        ArticleDO articleDO = this.articleRepository.findById(1L).orElse(null);
         logger.info(articleDO.toString());
-        articleDO.setSummary("李白 唐朝诗人 字太白");
+        articleDO.setTitle("Hello world");
+        articleDO.setVersion(1L);
         this.articleRepository.save(articleDO);
     }
 

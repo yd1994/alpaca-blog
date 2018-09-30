@@ -39,13 +39,13 @@ public interface BaseService<D> {
      * @param id 修改实体的id
      * @return 修改是否成功
      */
-    boolean update(D d, Long id);
+    void update(D d, Long id);
 
     /**
      * 通过 id 删除
      * @param id
      * @return 删除是否成功
      */
-    boolean delete(Long id);
+    void delete(Long id);
 
 }
