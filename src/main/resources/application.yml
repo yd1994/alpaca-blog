@@ -5,9 +5,9 @@ spring:
     name: alpaca-blog
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://184.170.209.225:3307/alpaca_blog?charset=utf8mb4&serverTimezone=GMT&useSSL=false&autoReconnect=true
-    username: mysql1
-    password: mysql1pass1230
+    url: jdbc:mysql://localhost:3308/alpaca_blog?charset=utf8mb4&serverTimezone=GMT&useSSL=false&autoReconnect=true
+    username: root
+    password: 123456
   jpa:
     hibernate:
       ddl-auto: none
