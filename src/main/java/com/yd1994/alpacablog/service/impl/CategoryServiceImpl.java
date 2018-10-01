@@ -1,9 +1,12 @@
 package com.yd1994.alpacablog.service.impl;
 
+import com.yd1994.alpacablog.common.base.BaseServiceImpl;
 import com.yd1994.alpacablog.common.exception.ResourceNotFoundException;
 import com.yd1994.alpacablog.common.exception.TableVersionNotFoundException;
 import com.yd1994.alpacablog.common.exception.VersionNotFoundException;
+import com.yd1994.alpacablog.common.param.RestRequestParam;
 import com.yd1994.alpacablog.dto.Category;
+import com.yd1994.alpacablog.entity.ArticleDO;
 import com.yd1994.alpacablog.entity.CategoryDO;
 import com.yd1994.alpacablog.repository.CategoryRepository;
 import com.yd1994.alpacablog.service.CategoryService;
@@ -14,10 +17,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.util.*;
 
 @Service
-public class CategoryServiceImpl implements CategoryService {
+public class CategoryServiceImpl extends BaseServiceImpl<CategoryDO> implements CategoryService {
 
     @Autowired
     private CategoryRepository categoryRepository;
@@ -34,24 +40,29 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<Category> list(Pageable pageable) {
-        Page<CategoryDO> page = this.categoryRepository.findAll(pageable);
-        List<Category> categoryList = new ArrayList<>(page.getSize() + 1);
-        page.getContent().stream().forEach(categoryDO -> categoryList.add(new Category(categoryDO)));
+    public List<Category> list(RestRequestParam requestParam) {
+        Pageable pageable = requestParam.getPageable();
+        Page<CategoryDO> categoryDOPage = this.categoryRepository.findAll(this.getRestSpecification(requestParam), pageable);
+        List<Category> categoryList = new ArrayList<>(categoryDOPage.getContent().size());
+        categoryDOPage.getContent().forEach(categoryDO -> categoryList.add(new Category(categoryDO)));
         return categoryList;
     }
 
+
     @Override
-    public boolean add(Category category) {
+    protected void addRestSpecificationPredicateList(List<Predicate> predicateList, Root<CategoryDO> root, CriteriaBuilder criteriaBuilder) {
+    }
+
+    @Override
+    public void add(Category category) {
         category.setId(null);
-        CategoryDO categoryDO = this.categoryRepository.save(category.toEntity());
+        CategoryDO categoryDO = category.toEntity();
+        categoryDO.setAvailable(true);
+        categoryDO.setDelete(false);
         Date date = new Date();
         categoryDO.setGmtCreated(date);
         categoryDO.setGmtModified(date);
-        if (categoryDO == null) {
-            return false;
-        }
-        return true;
+        this.categoryRepository.save(categoryDO);
     }
 
     @Override
@@ -101,4 +112,5 @@ public class CategoryServiceImpl implements CategoryService {
     public void delete(Long id) {
         this.categoryRepository.deleteById(id);
     }
+
 }

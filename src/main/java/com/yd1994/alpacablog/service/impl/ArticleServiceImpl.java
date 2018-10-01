@@ -1,20 +1,24 @@
 package com.yd1994.alpacablog.service.impl;
 
+import com.yd1994.alpacablog.common.base.BaseServiceImpl;
 import com.yd1994.alpacablog.common.exception.ResourceNotFoundException;
 import com.yd1994.alpacablog.common.exception.TableVersionNotFoundException;
 import com.yd1994.alpacablog.common.exception.VersionNotFoundException;
+import com.yd1994.alpacablog.common.param.RestRequestParam;
 import com.yd1994.alpacablog.dto.Article;
 import com.yd1994.alpacablog.entity.ArticleDO;
 import com.yd1994.alpacablog.repository.ArticleRepository;
 import com.yd1994.alpacablog.service.ArticleService;
 import org.hibernate.StaleObjectStateException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.util.*;
 
 /**
@@ -23,7 +27,7 @@ import java.util.*;
  * @author yd
  */
 @Service
-public class ArticleServiceImpl implements ArticleService {
+public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements ArticleService {
 
     @Autowired
     private ArticleRepository articleRepository;
@@ -40,24 +44,28 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public List<Article> list(Pageable pageable) {
-        Page<ArticleDO> page = this.articleRepository.findAll(pageable);
-        List<Article> articleList = new ArrayList<>(page.getSize() + 1);
-        page.getContent().stream().forEach(articleDO -> articleList.add(new Article(articleDO)));
+    public List<Article> list(RestRequestParam requestParam) {
+        Pageable pageable = requestParam.getPageable();
+        Page<ArticleDO> articlePage = this.articleRepository.findAll( this.getRestSpecification(requestParam), pageable);
+        List<Article> articleList = new ArrayList<>(articlePage.getContent().size());
+        articlePage.getContent().forEach(articleDO -> articleList.add(new Article(articleDO)));
         return articleList;
     }
 
     @Override
-    public boolean add(Article article) {
+    protected void addRestSpecificationPredicateList(List<Predicate> predicateList, Root<ArticleDO> root, CriteriaBuilder criteriaBuilder) {
+    }
+
+    @Override
+    public void add(Article article) {
         ArticleDO articleDO = article.toEntity();
+        articleDO.setTraffic(0L);
+        articleDO.setTop(false);
+        articleDO.setDelete(false);
         Date date = new Date();
         articleDO.setGmtCreated(date);
         articleDO.setGmtModified(date);
-        articleDO = this.articleRepository.saveAndFlush(articleDO);
-        if (articleDO != null) {
-            return true;
-        }
-        return false;
+        this.articleRepository.saveAndFlush(articleDO);
     }
 
     @Override

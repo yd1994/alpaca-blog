@@ -24,7 +24,7 @@ public abstract class BaseRestController<T, E extends BaseService<T>> {
     @PostMapping
     public ResultFactory.Info add(T t) {
         this.e.add(t);
-        return ResultFactory.get200Info().message("添加成功成功");
+        return ResultFactory.get200Info().message("添加成功");
     }
 
     @PutMapping("/{id}")
