@@ -15,3 +15,14 @@ spring:
   jackson:
     serialization:
       indent-output: true
+  redis:
+    host: 127.0.0.1
+    port: 6380
+    password: 123456
+    database: 0
+    jedis:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+        max-wait: -1ms

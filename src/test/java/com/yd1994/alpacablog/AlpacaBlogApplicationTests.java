@@ -1,7 +1,9 @@
 package com.yd1994.alpacablog;
 
 import com.yd1994.alpacablog.entity.ArticleDO;
+import com.yd1994.alpacablog.entity.AuthOauthClientDetails;
 import com.yd1994.alpacablog.repository.ArticleRepository;
+import com.yd1994.alpacablog.repository.AuthOauthClientDetailsRepository;
 import com.yd1994.alpacablog.repository.CategoryRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Date;
@@ -27,9 +30,18 @@ public class AlpacaBlogApplicationTests {
     private ArticleRepository articleRepository;
     @Autowired
     private CategoryRepository categoryRepository;
+    @Autowired
+    private AuthOauthClientDetailsRepository authOauthClientDetailsRepository;
 
     @Test
     public void contextLoads() {
+    }
+
+    @Test
+    public void testBCryptPasswordEncoder() {
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        String encodePassword = bCryptPasswordEncoder.encode("123456");
+        logger.info(encodePassword);
     }
 
     @Test
@@ -61,6 +73,12 @@ public class AlpacaBlogApplicationTests {
         articleDO.setTitle("Hello world");
         articleDO.setVersion(1L);
         this.articleRepository.save(articleDO);
+    }
+
+    @Test
+    public void testAuthOauthClientDetailsRepository() {
+        AuthOauthClientDetails authOauthClientDetails = this.authOauthClientDetailsRepository.findFirstByClientId("client1");
+        logger.info(authOauthClientDetails.toString());
     }
 
 }
