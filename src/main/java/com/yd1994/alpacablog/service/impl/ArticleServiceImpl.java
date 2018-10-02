@@ -11,6 +11,10 @@ import com.yd1994.alpacablog.repository.ArticleRepository;
 import com.yd1994.alpacablog.service.ArticleService;
 import org.hibernate.StaleObjectStateException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,11 +31,13 @@ import java.util.*;
  * @author yd
  */
 @Service
+@CacheConfig(cacheNames = "articles")
 public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements ArticleService {
 
     @Autowired
     private ArticleRepository articleRepository;
 
+    @Cacheable(key = "#id", unless = "#result == null")
     @Override
     public Article get(Long id) {
         Optional<ArticleDO> optionalArticleDO = this.articleRepository.findById(id);
@@ -68,6 +74,7 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
         this.articleRepository.saveAndFlush(articleDO);
     }
 
+    @CachePut(key = "#id")
     @Override
     public void update(Article article, Long id) {
         Optional<ArticleDO> optionalArticleDO = this.articleRepository.findById(id);
@@ -113,6 +120,7 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
         }
     }
 
+    @CacheEvict(key = "#id")
     @Override
     public void delete(Long id) {
         this.articleRepository.deleteById(id);

@@ -12,6 +12,10 @@ import com.yd1994.alpacablog.repository.CategoryRepository;
 import com.yd1994.alpacablog.service.CategoryService;
 import org.hibernate.StaleObjectStateException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,11 +27,13 @@ import javax.persistence.criteria.Root;
 import java.util.*;
 
 @Service
+@CacheConfig(cacheNames = "categories")
 public class CategoryServiceImpl extends BaseServiceImpl<CategoryDO> implements CategoryService {
 
     @Autowired
     private CategoryRepository categoryRepository;
 
+    @Cacheable(key = "#id", unless = "#result == null")
     @Override
     public Category get(Long id) {
         Optional<CategoryDO> optionalCategoryDO = this.categoryRepository.findById(id);
@@ -53,6 +59,7 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryDO> implements 
     protected void addRestSpecificationPredicateList(List<Predicate> predicateList, Root<CategoryDO> root, CriteriaBuilder criteriaBuilder) {
     }
 
+    @CachePut(key = "#id")
     @Override
     public void add(Category category) {
         category.setId(null);
@@ -108,6 +115,7 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryDO> implements 
         }
     }
 
+    @CacheEvict(key = "#id")
     @Override
     public void delete(Long id) {
         this.categoryRepository.deleteById(id);
