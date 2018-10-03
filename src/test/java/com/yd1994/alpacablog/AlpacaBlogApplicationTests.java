@@ -16,12 +16,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Transactional(readOnly = true)
 public class AlpacaBlogApplicationTests {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -37,14 +39,14 @@ public class AlpacaBlogApplicationTests {
     public void contextLoads() {
     }
 
-    @Test
+    //@Test
     public void testBCryptPasswordEncoder() {
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         String encodePassword = bCryptPasswordEncoder.encode("123456");
         logger.info(encodePassword);
     }
 
-    @Test
+    //@Test
     public void testArticleRepositoryAdd() {
         ArticleDO articleDO = new ArticleDO();
         articleDO.setTitle("静夜思");
@@ -58,7 +60,7 @@ public class AlpacaBlogApplicationTests {
         this.articleRepository.save(articleDO);
     }
 
-    @Test
+    //@Test
     public void testArticleRepositoryGet() {
         Pageable pageable = new PageRequest(0, 10);
         Page<ArticleDO> page = this.articleRepository.findAll(pageable);
@@ -66,7 +68,7 @@ public class AlpacaBlogApplicationTests {
         articleDOList.stream().forEach(articleDO -> logger.info(articleDO.toString()));
     }
 
-    @Test
+    //@Test
     public void testArticleRepositoryUpdate() {
         ArticleDO articleDO = this.articleRepository.findById(1L).orElse(null);
         logger.info(articleDO.toString());
@@ -75,7 +77,7 @@ public class AlpacaBlogApplicationTests {
         this.articleRepository.save(articleDO);
     }
 
-    @Test
+    //@Test
     public void testAuthOauthClientDetailsRepository() {
         AuthOauthClientDetails authOauthClientDetails = this.authOauthClientDetailsRepository.findFirstByClientId("client1");
         logger.info(authOauthClientDetails.toString());

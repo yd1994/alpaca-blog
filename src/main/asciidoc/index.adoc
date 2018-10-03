@@ -1,0 +1,21 @@
+
+[[example_curl_request]]
+== Curl request
+
+include::{snippets}/index/curl-request.adoc[]
+
+[[example_http_request]]
+== HTTP request
+
+include::{snippets}/index/http-request.adoc[]
+== request parameters
+
+include::{snippets}/index/request-parameters.adoc[]
+
+[[example_http_response]]
+== HTTP response
+
+include::{snippets}/index/http-response.adoc[]
+== response fields
+
+include::{snippets}/index/response-fields.adoc[]
