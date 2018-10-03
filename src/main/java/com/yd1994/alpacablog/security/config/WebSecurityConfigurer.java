@@ -29,6 +29,7 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.csrf().disable();
         http.authorizeRequests()
                 // 对 /oauth/** 开放所有访问权限
                 .antMatchers("/oauth/**").permitAll();

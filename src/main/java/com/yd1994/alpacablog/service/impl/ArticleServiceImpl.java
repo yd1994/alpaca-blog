@@ -17,6 +17,7 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -49,17 +50,32 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
         }
     }
 
+
     @Override
-    public List<Article> list(RestRequestParam requestParam) {
+    protected void addRestSpecificationPredicateList(List<Predicate> predicateList, Root<ArticleDO> root, CriteriaBuilder criteriaBuilder) {
+    }
+
+    @Override
+    public List<Article> listByCategoryId(RestRequestParam requestParam) {
         Pageable pageable = requestParam.getPageable();
-        Page<ArticleDO> articlePage = this.articleRepository.findAll( this.getRestSpecification(requestParam), pageable);
+        Page<ArticleDO> articlePage = this.articleRepository.findAll(this.getRestSpecification(requestParam), pageable);
         List<Article> articleList = new ArrayList<>(articlePage.getContent().size());
         articlePage.getContent().forEach(articleDO -> articleList.add(new Article(articleDO)));
         return articleList;
     }
 
     @Override
-    protected void addRestSpecificationPredicateList(List<Predicate> predicateList, Root<ArticleDO> root, CriteriaBuilder criteriaBuilder) {
+    public List<Article> listByCategoryId(Long categoryId, RestRequestParam requestParam) {
+        Pageable pageable = requestParam.getPageable();
+        Specification<ArticleDO> restRequestParamSpecification = this.getRestSpecification(requestParam);
+        Specification<ArticleDO> categorySpecification = (Specification<ArticleDO>) (root, query, criteriaBuilder) -> {
+            return criteriaBuilder.equal(root.join("categoryDO").get("id"), categoryId);
+        };
+        Page<ArticleDO> articlePage = this.articleRepository.findAll(
+                Specification.where(restRequestParamSpecification).and(categorySpecification), pageable);
+        List<Article> articleList = new ArrayList<>(articlePage.getContent().size());
+        articlePage.getContent().forEach(articleDO -> articleList.add(new Article(articleDO)));
+        return articleList;
     }
 
     @Override

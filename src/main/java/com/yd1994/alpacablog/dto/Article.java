@@ -94,7 +94,7 @@ public class Article extends BaseDTO<ArticleDO> implements Serializable {
     public ArticleDO toEntity() {
         ArticleDO articleDO = new ArticleDO();
         BeanUtils.copyProperties(this, articleDO);
-        articleDO.setGmtCreated(this.getCeated());
+        articleDO.setGmtCreated(this.getCreated());
         articleDO.setGmtModified(this.getModified());
         if (this.getCategory() != null) {
             articleDO.setCategoryDO(this.getCategory().toEntity());
@@ -159,11 +159,11 @@ public class Article extends BaseDTO<ArticleDO> implements Serializable {
         this.version = version;
     }
 
-    public Date getCeated() {
+    public Date getCreated() {
         return created;
     }
 
-    public void setCeated(Date created) {
+    public void setCreated(Date created) {
         this.created = created;
     }
 

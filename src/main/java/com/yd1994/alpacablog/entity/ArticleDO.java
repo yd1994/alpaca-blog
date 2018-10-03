@@ -81,8 +81,8 @@ public class ArticleDO implements Serializable {
      */
     @OneToOne(targetEntity = CategoryDO.class)
     @JoinTable(name = "alpaca_blog_category_article",
-            joinColumns = {@JoinColumn(name = "categoryId", referencedColumnName = "id")},
-            inverseJoinColumns = {@JoinColumn(name = "articleId", referencedColumnName = "id")})
+            joinColumns = {@JoinColumn(name = "articleId", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "categoryId", referencedColumnName = "id")})
     private CategoryDO categoryDO;
 
     public Long getId() {

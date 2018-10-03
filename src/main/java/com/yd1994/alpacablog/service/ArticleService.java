@@ -17,6 +17,27 @@ import java.util.List;
  */
 public interface ArticleService extends BaseService<Article> {
 
-    List<Article> list(RestRequestParam requestParam);
+    /**
+     * 通过 RestRequestParam 获取 Article
+     *
+     * sortByAsc, sortByDesc 可选参数 id, title, content, summary, traffic
+     * beforeBy, afterBy 可选参数 created, modified
+     *
+     * @param requestParam
+     * @return
+     */
+    List<Article> listByCategoryId(RestRequestParam requestParam);
+
+    /**
+     * 通过 RestRequestParam 获取 分类：categoryId 下的  Article
+     *
+     * sortByAsc, sortByDesc 可选参数 id, title, content, summary, traffic
+     * beforeBy, afterBy 可选参数 created, modified
+     *
+     * @param categoryId 分类ID
+     * @param requestParam
+     * @return
+     */
+    List<Article> listByCategoryId(Long categoryId, RestRequestParam requestParam);
 
 }

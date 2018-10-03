@@ -18,9 +18,19 @@ public class ArticleController extends BaseRestController<Article, ArticleServic
     @Autowired
     private ArticleService articleService;
 
+    /**
+     * 获取 Article 集合
+     * page 默认：1 必须 大于 0
+     * size 默认：10 必须 大于 0
+     * sortByAsc, sortByDesc 可选参数 id, title, content, summary, traffic
+     * beforeBy, afterBy 可选参数 created, modified
+     *
+     * @param requestParam
+     * @return
+     */
     @GetMapping
     public List<Article> list(RestRequestParam requestParam) {
-        return this.articleService.list(requestParam);
+        return this.articleService.listByCategoryId(requestParam);
     }
 
 }
