@@ -5,6 +5,7 @@ import com.yd1994.alpacablog.common.exception.ResourceNotFoundException;
 import com.yd1994.alpacablog.common.exception.TableVersionNotFoundException;
 import com.yd1994.alpacablog.common.exception.VersionNotFoundException;
 import com.yd1994.alpacablog.common.param.RestRequestParam;
+import com.yd1994.alpacablog.common.result.ResultFactory;
 import com.yd1994.alpacablog.dto.Category;
 import com.yd1994.alpacablog.entity.ArticleDO;
 import com.yd1994.alpacablog.entity.CategoryDO;
@@ -46,12 +47,12 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryDO> implements 
     }
 
     @Override
-    public List<Category> list(RestRequestParam requestParam) {
+    public ResultFactory.Collection<Category> list(RestRequestParam requestParam) {
         Pageable pageable = requestParam.getPageable();
         Page<CategoryDO> categoryDOPage = this.categoryRepository.findAll(this.getRestSpecification(requestParam), pageable);
         List<Category> categoryList = new ArrayList<>(categoryDOPage.getContent().size());
         categoryDOPage.getContent().forEach(categoryDO -> categoryList.add(new Category(categoryDO)));
-        return categoryList;
+        return ResultFactory.getCollection(categoryList, categoryDOPage.getTotalElements());
     }
 
 

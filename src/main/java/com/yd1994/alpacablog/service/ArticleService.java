@@ -2,6 +2,7 @@ package com.yd1994.alpacablog.service;
 
 import com.yd1994.alpacablog.common.base.BaseService;
 import com.yd1994.alpacablog.common.param.RestRequestParam;
+import com.yd1994.alpacablog.common.result.ResultFactory;
 import com.yd1994.alpacablog.dto.Article;
 import com.yd1994.alpacablog.entity.ArticleDO;
 import org.springframework.data.domain.Page;
@@ -26,7 +27,7 @@ public interface ArticleService extends BaseService<Article> {
      * @param requestParam
      * @return
      */
-    List<Article> listByCategoryId(RestRequestParam requestParam);
+    ResultFactory.Collection<Article> list(RestRequestParam requestParam);
 
     /**
      * 通过 RestRequestParam 获取 分类：categoryId 下的  Article
@@ -38,6 +39,6 @@ public interface ArticleService extends BaseService<Article> {
      * @param requestParam
      * @return
      */
-    List<Article> listByCategoryId(Long categoryId, RestRequestParam requestParam);
+    ResultFactory.Collection<Article> listByCategoryId(Long categoryId, RestRequestParam requestParam);
 
 }

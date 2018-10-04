@@ -5,6 +5,7 @@ import com.yd1994.alpacablog.common.exception.ResourceNotFoundException;
 import com.yd1994.alpacablog.common.exception.TableVersionNotFoundException;
 import com.yd1994.alpacablog.common.exception.VersionNotFoundException;
 import com.yd1994.alpacablog.common.param.RestRequestParam;
+import com.yd1994.alpacablog.common.result.ResultFactory;
 import com.yd1994.alpacablog.dto.Article;
 import com.yd1994.alpacablog.entity.ArticleDO;
 import com.yd1994.alpacablog.repository.ArticleRepository;
@@ -56,16 +57,16 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
     }
 
     @Override
-    public List<Article> listByCategoryId(RestRequestParam requestParam) {
+    public ResultFactory.Collection<Article> list(RestRequestParam requestParam) {
         Pageable pageable = requestParam.getPageable();
         Page<ArticleDO> articlePage = this.articleRepository.findAll(this.getRestSpecification(requestParam), pageable);
         List<Article> articleList = new ArrayList<>(articlePage.getContent().size());
         articlePage.getContent().forEach(articleDO -> articleList.add(new Article(articleDO)));
-        return articleList;
+        return ResultFactory.getCollection(articleList, articlePage.getTotalElements());
     }
 
     @Override
-    public List<Article> listByCategoryId(Long categoryId, RestRequestParam requestParam) {
+    public ResultFactory.Collection<Article> listByCategoryId(Long categoryId, RestRequestParam requestParam) {
         Pageable pageable = requestParam.getPageable();
         Specification<ArticleDO> restRequestParamSpecification = this.getRestSpecification(requestParam);
         Specification<ArticleDO> categorySpecification = (Specification<ArticleDO>) (root, query, criteriaBuilder) -> {
@@ -75,7 +76,7 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
                 Specification.where(restRequestParamSpecification).and(categorySpecification), pageable);
         List<Article> articleList = new ArrayList<>(articlePage.getContent().size());
         articlePage.getContent().forEach(articleDO -> articleList.add(new Article(articleDO)));
-        return articleList;
+        return ResultFactory.getCollection(articleList, articlePage.getTotalElements());
     }
 
     @Override

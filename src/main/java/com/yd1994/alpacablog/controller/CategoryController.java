@@ -2,6 +2,7 @@ package com.yd1994.alpacablog.controller;
 
 import com.yd1994.alpacablog.common.base.BaseRestController;
 import com.yd1994.alpacablog.common.param.RestRequestParam;
+import com.yd1994.alpacablog.common.result.ResultFactory;
 import com.yd1994.alpacablog.dto.Article;
 import com.yd1994.alpacablog.dto.Category;
 import com.yd1994.alpacablog.service.ArticleService;
@@ -25,12 +26,12 @@ public class CategoryController extends BaseRestController<Category, CategorySer
     private ArticleService articleService;
 
     @GetMapping
-    public List<Category> list(RestRequestParam requestParam) {
+    public ResultFactory.Collection<Category> list(RestRequestParam requestParam) {
         return this.categoryService.list(requestParam);
     }
 
     @GetMapping("/{categoryId}/articles")
-    public List<Article> listByCategoryId(RestRequestParam requestParam, @PathVariable("categoryId") Long categoryId) {
+    public ResultFactory.Collection<Article> listByCategoryId(RestRequestParam requestParam, @PathVariable("categoryId") Long categoryId) {
         return this.articleService.listByCategoryId(categoryId, requestParam);
     }
 }

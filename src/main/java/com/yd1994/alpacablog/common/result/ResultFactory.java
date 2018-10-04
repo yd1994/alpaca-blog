@@ -1,6 +1,10 @@
 package com.yd1994.alpacablog.common.result;
 
+import org.springframework.security.core.parameters.P;
+
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 返回信息工厂
@@ -96,7 +100,7 @@ public class ResultFactory implements Serializable {
     /**
      * 返回信息
      */
-    public static class Info {
+    public static class Info implements Serializable {
 
         /**
          * 错误码
@@ -163,5 +167,53 @@ public class ResultFactory implements Serializable {
                     '}';
         }
     }
+
+    /**
+     * 获取 集合的返回信息
+     * @param data
+     * @param total
+     * @param <T>
+     * @return
+     */
+    public static <T> Collection<T> getCollection(List<T> data, Long total) {
+        return new Collection<T>(data, total);
+    }
+
+    /**
+     * 集合的返回信息
+     * @param <T>
+     */
+    public static class Collection<T> implements Serializable {
+
+        private List<T> data;
+        private Long total;
+
+        /**
+         *
+         * @param data 集合
+         * @param total 总数量
+         */
+        public Collection(List<T> data, Long total) {
+            this.data = data;
+            this.total = total;
+        }
+
+        public List<T> getData() {
+            return data;
+        }
+
+        public void setData(List<T> data) {
+            this.data = data;
+        }
+
+        public Long getTotal() {
+            return total;
+        }
+
+        public void setTotal(Long total) {
+            this.total = total;
+        }
+    }
+
 
 }
