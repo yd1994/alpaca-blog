@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,9 +32,17 @@ public class FileUploadController {
     @Autowired
     private FileService fileService;
 
+    @Autowired
+    private ResourceLoader resourceLoader;
+
     @GetMapping("/{id}")
-    public FileInfo get(@PathVariable("id") Long id) {
-        return this.fileService.get(id, 0);
+    public ResponseEntity get(@PathVariable("id") Long id) {
+        FileInfo fileInfo = this.fileService.get(id, 0);
+        try {
+            return ResponseEntity.ok(resourceLoader.getResource("file:" + fileInfo.getPath()));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping
