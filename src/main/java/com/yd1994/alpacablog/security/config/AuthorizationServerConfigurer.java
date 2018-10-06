@@ -38,7 +38,7 @@ public class AuthorizationServerConfigurer extends AuthorizationServerConfigurer
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
         endpoints.tokenStore(redisTokenStore())
                 .authenticationManager(authenticationManager)
-                .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST);
+                .allowedTokenEndpointRequestMethods(HttpMethod.POST);
     }
 
     @Override
@@ -56,4 +56,5 @@ public class AuthorizationServerConfigurer extends AuthorizationServerConfigurer
     public CustomClientDetailsService customClientDetailsService() {
         return new CustomClientDetailsService();
     }
+
 }

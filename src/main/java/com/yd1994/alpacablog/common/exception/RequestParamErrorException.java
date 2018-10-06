@@ -5,12 +5,12 @@ package com.yd1994.alpacablog.common.exception;
  *
  * @author yd
  */
-public class RequestParamErrorExcetion extends RuntimeException {
+public class RequestParamErrorException extends RuntimeException {
 
-    public RequestParamErrorExcetion() {
+    public RequestParamErrorException() {
     }
 
-    public RequestParamErrorExcetion(String message) {
+    public RequestParamErrorException(String message) {
         super(message);
     }
 

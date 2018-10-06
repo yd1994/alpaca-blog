@@ -57,10 +57,10 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryDO> implements 
 
 
     @Override
-    protected void addRestSpecificationPredicateList(List<Predicate> predicateList, Root<CategoryDO> root, CriteriaBuilder criteriaBuilder) {
+    protected void addRestSpecificationPredicateList(List<Predicate> predicateList, Root<CategoryDO> root,
+                                                     CriteriaBuilder criteriaBuilder, RestRequestParam requestParam) {
     }
 
-    @CachePut(key = "#id")
     @Override
     public void add(Category category) {
         category.setId(null);
@@ -73,6 +73,7 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryDO> implements 
         this.categoryRepository.save(categoryDO);
     }
 
+    @CacheEvict(key = "#id")
     @Override
     public void update(Category category, Long id) {
         Optional<CategoryDO> optionalCategoryDO = this.categoryRepository.findById(id);
@@ -81,6 +82,7 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryDO> implements 
             CategoryDO sourceCategoryDO = category.toEntity();
             this.copyForUpdate(sourceCategoryDO, targetCategoryDO);
             targetCategoryDO.setGmtModified(new Date());
+            this.categoryRepository.save(targetCategoryDO);
         } catch (NoSuchElementException e) {
             throw new ResourceNotFoundException("Category：" + id + " 不存在。");
         }
@@ -119,7 +121,15 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryDO> implements 
     @CacheEvict(key = "#id")
     @Override
     public void delete(Long id) {
-        this.categoryRepository.deleteById(id);
+        Optional<CategoryDO> optionalCategoryDO = this.categoryRepository.findById(id);
+        try {
+            CategoryDO targetCategoryDO = optionalCategoryDO.get();
+            targetCategoryDO.setDelete(true);
+            targetCategoryDO.setGmtModified(new Date());
+            this.categoryRepository.save(targetCategoryDO);
+        } catch (NoSuchElementException e) {
+            throw new ResourceNotFoundException("Category：" + id + " 不存在。");
+        }
     }
 
 }

@@ -1,9 +1,6 @@
 package com.yd1994.alpacablog.common.advice;
 
-import com.yd1994.alpacablog.common.exception.RequestParamErrorExcetion;
-import com.yd1994.alpacablog.common.exception.ResourceNotFoundException;
-import com.yd1994.alpacablog.common.exception.TableVersionNotFoundException;
-import com.yd1994.alpacablog.common.exception.VersionNotFoundException;
+import com.yd1994.alpacablog.common.exception.*;
 import com.yd1994.alpacablog.common.result.ResultFactory;
 import org.hibernate.StaleObjectStateException;
 import org.slf4j.Logger;
@@ -72,14 +69,14 @@ public class RestExceptionHandler {
     }
 
     /**
-     * request 上传的参数格式错位、参数错位、有误异常统一处理
+     * request 上传的参数格式错误、参数错误、有误异常统一处理
      * 返回 400 错误码
      * @param request
      * @param ex
      * @return
      */
-    @ExceptionHandler(value = RequestParamErrorExcetion.class)
-    public ResultFactory.Info versionNotFoundException(NativeWebRequest request, RequestParamErrorExcetion ex) {
+    @ExceptionHandler(value = RequestParamErrorException.class)
+    public ResultFactory.Info versionNotFoundException(NativeWebRequest request, RequestParamErrorException ex) {
         logger.info(ex.getMessage());
         return ResultFactory.get400Info().appendMessage(ex.getMessage());
     }
@@ -104,7 +101,7 @@ public class RestExceptionHandler {
      * @param ex
      * @return
      */
-    @ExceptionHandler(value = {TableVersionNotFoundException.class, IllegalArgumentException.class})
+    @ExceptionHandler(value = {TableVersionNotFoundException.class, IllegalArgumentException.class, UploadErrorException.class})
     public ResultFactory.Info tableVersionNotFoundException(NativeWebRequest request, RuntimeException ex) {
         logger.error(ex.getMessage());
         return ResultFactory.get500Info();

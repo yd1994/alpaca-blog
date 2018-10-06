@@ -73,19 +73,6 @@ public class Article extends BaseDTO<ArticleDO> implements Serializable {
         }
     }
 
-    public Article(Long id, String title, String content, String summary, Long traffic, Boolean top, Long version, Date created, Date modified, Category category) {
-        this.id = id;
-        this.title = title;
-        this.content = content;
-        this.summary = summary;
-        this.traffic = traffic;
-        this.top = top;
-        this.version = version;
-        this.created = created;
-        this.modified = modified;
-        this.category = category;
-    }
-
     /**
      * 转换为 ArticleDO
      * @return

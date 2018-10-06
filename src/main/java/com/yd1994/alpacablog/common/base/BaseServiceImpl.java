@@ -1,6 +1,6 @@
 package com.yd1994.alpacablog.common.base;
 
-import com.yd1994.alpacablog.common.exception.RequestParamErrorExcetion;
+import com.yd1994.alpacablog.common.exception.RequestParamErrorException;
 import com.yd1994.alpacablog.common.param.RestRequestParam;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
@@ -32,12 +32,12 @@ public abstract class BaseServiceImpl<E> {
                     else if ("modified".equals(requestParam.getBeforeBy())) {
                         requestParam.setBeforeBy("gmtModified");
                     } else {
-                        throw new RequestParamErrorExcetion("beforeBy参数不可为：" + requestParam.getBeforeBy() +  "。");
+                        throw new RequestParamErrorException("beforeBy参数不可为：" + requestParam.getBeforeBy() +  "。");
                     }
                     // 在 该时间 之前（包含该时间）
                     predicateList.add(criteriaBuilder.lessThanOrEqualTo(root.get(requestParam.getBeforeBy()).as(Date.class), requestParam.getBefore()));
                 } else {
-                    throw new RequestParamErrorExcetion("beforeBy参数不可空。");
+                    throw new RequestParamErrorException("beforeBy参数不可空。");
                 }
             }
             if (requestParam.getAfter() != null) {
@@ -48,15 +48,17 @@ public abstract class BaseServiceImpl<E> {
                     else if ("modified".equals(requestParam.getAfterBy())) {
                         requestParam.setAfterBy("gmtModified");
                     } else {
-                        throw new RequestParamErrorExcetion("afterBy参数不可为：" + requestParam.getBeforeBy() +  "。");
+                        throw new RequestParamErrorException("afterBy参数不可为：" + requestParam.getBeforeBy() +  "。");
                     }
                     // 在 该时间 之后（包含该时间）
                     predicateList.add(criteriaBuilder.greaterThanOrEqualTo(root.get(requestParam.getAfterBy()).as(Date.class), requestParam.getAfter()));
                 } else {
-                    throw new RequestParamErrorExcetion("afterBy参数不可空。");
+                    throw new RequestParamErrorException("afterBy参数不可空。");
                 }
             }
-            this.addRestSpecificationPredicateList(predicateList, root, criteriaBuilder);
+            // 筛选出未删除
+            predicateList.add(criteriaBuilder.equal(root.get("delete").as(Boolean.class), false));
+            this.addRestSpecificationPredicateList(predicateList, root, criteriaBuilder, requestParam);
             Predicate[] p = new Predicate[predicateList.size()];
             query.where(criteriaBuilder.and(predicateList.toArray(p)));
             if (!StringUtils.isEmpty(requestParam.getSortByAsc())) {
@@ -88,6 +90,6 @@ public abstract class BaseServiceImpl<E> {
      * @param root
      * @param criteriaBuilder
      */
-    protected abstract void addRestSpecificationPredicateList(List<Predicate> predicateList, Root<E> root, CriteriaBuilder criteriaBuilder);
+    protected abstract void addRestSpecificationPredicateList(List<Predicate> predicateList, Root<E> root, CriteriaBuilder criteriaBuilder, RestRequestParam requestParam);
 
 }

@@ -110,6 +110,10 @@ public class ResultFactory implements Serializable {
          * 提示信息
          */
         private String message;
+        /**
+         * 返回数据
+         */
+        private Object data;
 
         public Info() {
         }
@@ -130,6 +134,11 @@ public class ResultFactory implements Serializable {
          */
         public Info appendMessage(String message) {
             this.message += message;
+            return this;
+        }
+
+        public Info data(Object data) {
+            this.data = data;
             return this;
         }
 
@@ -159,11 +168,20 @@ public class ResultFactory implements Serializable {
             this.message = message;
         }
 
+        public Object getData() {
+            return data;
+        }
+
+        public void setData(Object data) {
+            this.data = data;
+        }
+
         @Override
         public String toString() {
             return "Info{" +
                     "status=" + status +
                     ", message='" + message + '\'' +
+                    ", data=" + data +
                     '}';
         }
     }

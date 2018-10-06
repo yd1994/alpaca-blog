@@ -19,15 +19,18 @@ import java.util.List;
 public interface ArticleService extends BaseService<Article> {
 
     /**
-     * 通过 RestRequestParam 获取 Article
+     * 通过 RestRequestParam，categoryId 获取 Article
      *
      * sortByAsc, sortByDesc 可选参数 id, title, content, summary, traffic
      * beforeBy, afterBy 可选参数 created, modified
      *
+     * categoryId: 可为空
+     *
      * @param requestParam
+     * @param categoryId 分类id
      * @return
      */
-    ResultFactory.Collection<Article> list(RestRequestParam requestParam);
+    ResultFactory.Collection<Article> list(RestRequestParam requestParam, Long categoryId);
 
     /**
      * 通过 RestRequestParam 获取 分类：categoryId 下的  Article

@@ -1,6 +1,6 @@
 package com.yd1994.alpacablog.common.param;
 
-import com.yd1994.alpacablog.common.exception.RequestParamErrorExcetion;
+import com.yd1994.alpacablog.common.exception.RequestParamErrorException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -50,6 +50,10 @@ public class RestRequestParam implements Serializable {
      */
     @DateTimeFormat(pattern="yyyy-MM-dd")
     private Date after;
+    /**
+     * 预定义搜索内容
+     */
+    private String view;
 
     /**
      * 获取jpa分页信息
@@ -57,10 +61,10 @@ public class RestRequestParam implements Serializable {
      */
     public Pageable getPageable() {
         if (page <= 0) {
-            throw new RequestParamErrorExcetion("参数page不能小于1或者为空。");
+            throw new RequestParamErrorException("参数page不能小于1或者为空。");
         }
         if (size <= 0) {
-            throw new RequestParamErrorExcetion("参数size不能小于1或者为空。");
+            throw new RequestParamErrorException("参数size不能小于1或者为空。");
         }
         return new PageRequest(page - 1, size);
     }
@@ -129,6 +133,14 @@ public class RestRequestParam implements Serializable {
         this.after = after;
     }
 
+    public String getView() {
+        return view;
+    }
+
+    public void setView(String view) {
+        this.view = view;
+    }
+
     @Override
     public String toString() {
         return "RestRequestParam{" +
@@ -136,8 +148,11 @@ public class RestRequestParam implements Serializable {
                 ", size=" + size +
                 ", sortByAsc='" + sortByAsc + '\'' +
                 ", sortByDesc='" + sortByDesc + '\'' +
+                ", beforeBy='" + beforeBy + '\'' +
                 ", before=" + before +
+                ", afterBy='" + afterBy + '\'' +
                 ", after=" + after +
+                ", view='" + view + '\'' +
                 '}';
     }
 }

@@ -11,4 +11,12 @@ import java.util.List;
 
 public interface ArticleRepository extends JpaRepository<ArticleDO, Long>, JpaSpecificationExecutor<ArticleDO> {
 
+    /**
+     * 通过 id、delete 查找
+     * @param id
+     * @param delete
+     * @return
+     */
+    ArticleDO findFirstByIdAndDelete(Long id, Boolean delete);
+
 }

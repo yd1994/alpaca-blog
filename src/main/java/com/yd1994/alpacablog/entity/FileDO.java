@@ -9,14 +9,9 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
-/**
- * 博文
- *
- * @author yd
- */
 @Entity
-@Table(name = "alpaca_blog_article")
-public class ArticleDO implements Serializable {
+@Table(name = "alpaca_blog_file")
+public class FileDO implements Serializable {
 
     /**
      * ID
@@ -25,27 +20,18 @@ public class ArticleDO implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     /**
-     * 标题
+     * 文件名
      */
-    @Column
-    private String title;
+    private String name;
     /**
-     * 内容
+     * 文件类型
+     * 0：图片
      */
-    private String content;
+    private Integer type;
     /**
-     * 简介
+     * 文件地址
      */
-    private String summary;
-    /**
-     * 点击量
-     */
-    private Long traffic = 0L;
-    /**
-     * 是否置顶
-     */
-    @Column(name = "is_top")
-    private Boolean top = false;
+    private String path;
     /**
      * 是否被删除
      */
@@ -76,14 +62,6 @@ public class ArticleDO implements Serializable {
      */
     @LastModifiedBy
     private String modifiedBy;
-    /**
-     * 分类
-     */
-    @OneToOne(targetEntity = CategoryDO.class)
-    @JoinTable(name = "alpaca_blog_category_article",
-            joinColumns = {@JoinColumn(name = "articleId", referencedColumnName = "id")},
-            inverseJoinColumns = {@JoinColumn(name = "categoryId", referencedColumnName = "id")})
-    private CategoryDO categoryDO;
 
     public Long getId() {
         return id;
@@ -93,45 +71,28 @@ public class ArticleDO implements Serializable {
         this.id = id;
     }
 
-    public String getTitle() {
-        return title;
+    public String getName() {
+        return name;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getContent() {
-        return content;
+    public Integer getType() {
+        return type;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setType(Integer type) {
+        this.type = type;
     }
 
-    public String getSummary() {
-        return summary;
+    public String getPath() {
+        return path;
     }
 
-    public void setSummary(String summary) {
-        this.summary = summary;
-    }
-
-
-    public Long getTraffic() {
-        return traffic;
-    }
-
-    public void setTraffic(Long traffic) {
-        this.traffic = traffic;
-    }
-
-    public Boolean getTop() {
-        return top;
-    }
-
-    public void setTop(Boolean top) {
-        this.top = top;
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public Boolean getDelete() {
@@ -182,30 +143,19 @@ public class ArticleDO implements Serializable {
         this.modifiedBy = modifiedBy;
     }
 
-    public CategoryDO getCategoryDO() {
-        return categoryDO;
-    }
-
-    public void setCategoryDO(CategoryDO categoryDO) {
-        this.categoryDO = categoryDO;
-    }
-
     @Override
     public String toString() {
-        return "ArticleDO{" +
+        return "FileDO{" +
                 "id=" + id +
-                ", title='" + title + '\'' +
-                ", content='" + content + '\'' +
-                ", summary='" + summary + '\'' +
-                ", traffic=" + traffic +
-                ", top=" + top +
+                ", name='" + name + '\'' +
+                ", type=" + type +
+                ", path='" + path + '\'' +
                 ", delete=" + delete +
                 ", version=" + version +
                 ", gmtCreated=" + gmtCreated +
                 ", createdBy='" + createdBy + '\'' +
                 ", gmtModified=" + gmtModified +
                 ", modifiedBy='" + modifiedBy + '\'' +
-                ", categoryDO=" + categoryDO +
                 '}';
     }
 }

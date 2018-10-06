@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.*;
@@ -42,27 +43,30 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
     @Cacheable(key = "#id", unless = "#result == null")
     @Override
     public Article get(Long id) {
-        Optional<ArticleDO> optionalArticleDO = this.articleRepository.findById(id);
-        try {
-            ArticleDO articleDO = optionalArticleDO.get();
-            return new Article(articleDO);
-        } catch (NoSuchElementException e) {
+        ArticleDO articleDO = this.articleRepository.findFirstByIdAndDelete(id, false);
+        if (articleDO == null) {
             throw new ResourceNotFoundException("Article：" + id + " 不存在。");
+        }
+        return new Article(articleDO);
+    }
+
+
+    @Override
+    protected void addRestSpecificationPredicateList(List<Predicate> predicateList, Root<ArticleDO> root,
+                                                     CriteriaBuilder criteriaBuilder, RestRequestParam requestParam) {
+        if (!StringUtils.isEmpty(requestParam.getView())) {
+            Predicate titlePredicate = criteriaBuilder.like(root.get("title")
+                    .as(String.class), "%" + requestParam.getView() + "%");
+            Predicate contentPredicate = criteriaBuilder.like(root.get("title")
+                            .as(String.class), "%" + requestParam.getView() + "%");
+            Predicate p = criteriaBuilder.or(titlePredicate, contentPredicate);
+            predicateList.add(p);
         }
     }
 
-
     @Override
-    protected void addRestSpecificationPredicateList(List<Predicate> predicateList, Root<ArticleDO> root, CriteriaBuilder criteriaBuilder) {
-    }
-
-    @Override
-    public ResultFactory.Collection<Article> list(RestRequestParam requestParam) {
-        Pageable pageable = requestParam.getPageable();
-        Page<ArticleDO> articlePage = this.articleRepository.findAll(this.getRestSpecification(requestParam), pageable);
-        List<Article> articleList = new ArrayList<>(articlePage.getContent().size());
-        articlePage.getContent().forEach(articleDO -> articleList.add(new Article(articleDO)));
-        return ResultFactory.getCollection(articleList, articlePage.getTotalElements());
+    public ResultFactory.Collection<Article> list(RestRequestParam requestParam, Long categoryId) {
+        return this.listByCategoryId(categoryId,requestParam);
     }
 
     @Override
@@ -70,7 +74,10 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
         Pageable pageable = requestParam.getPageable();
         Specification<ArticleDO> restRequestParamSpecification = this.getRestSpecification(requestParam);
         Specification<ArticleDO> categorySpecification = (Specification<ArticleDO>) (root, query, criteriaBuilder) -> {
-            return criteriaBuilder.equal(root.join("categoryDO").get("id"), categoryId);
+            if (categoryId != null && categoryId > 0) {
+                return criteriaBuilder.equal(root.join("categoryDO").get("id"), categoryId);
+            }
+            return null;
         };
         Page<ArticleDO> articlePage = this.articleRepository.findAll(
                 Specification.where(restRequestParamSpecification).and(categorySpecification), pageable);
@@ -91,7 +98,7 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
         this.articleRepository.saveAndFlush(articleDO);
     }
 
-    @CachePut(key = "#id")
+    @CacheEvict(key = "#id")
     @Override
     public void update(Article article, Long id) {
         Optional<ArticleDO> optionalArticleDO = this.articleRepository.findById(id);
@@ -100,6 +107,7 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
             ArticleDO sourceArticleDO = article.toEntity();
             this.copyForUpdate(sourceArticleDO, targetArticleDO);
             targetArticleDO.setGmtModified(new Date());
+            this.articleRepository.save(targetArticleDO);
         } catch (NoSuchElementException e) {
             throw new ResourceNotFoundException("Article：" + id + " 不存在。");
         }
@@ -140,7 +148,15 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
     @CacheEvict(key = "#id")
     @Override
     public void delete(Long id) {
-        this.articleRepository.deleteById(id);
+        Optional<ArticleDO> optionalArticleDO = this.articleRepository.findById(id);
+        try {
+            ArticleDO targetArticleDO = optionalArticleDO.get();
+            targetArticleDO.setDelete(true);
+            targetArticleDO.setGmtModified(new Date());
+            this.articleRepository.save(targetArticleDO);
+        } catch (NoSuchElementException e) {
+            throw new ResourceNotFoundException("Article：" + id + " 不存在。");
+        }
     }
 
 }
