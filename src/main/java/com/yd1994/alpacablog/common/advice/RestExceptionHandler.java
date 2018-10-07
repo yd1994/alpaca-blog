@@ -9,6 +9,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.multipart.MultipartException;
 
 import java.util.NoSuchElementException;
 
@@ -88,7 +89,10 @@ public class RestExceptionHandler {
      * @param ex
      * @return
      */
-    @ExceptionHandler(value = {ResourceNotFoundException.class, NoSuchElementException.class, EmptyResultDataAccessException.class})
+    @ExceptionHandler(value = {
+            ResourceNotFoundException.class,
+            NoSuchElementException.class,
+            EmptyResultDataAccessException.class})
     public ResultFactory.Info sourceNotFoundException(NativeWebRequest request, Exception ex) {
         logger.debug(ex.getMessage());
         return ResultFactory.get404Info();
@@ -97,11 +101,19 @@ public class RestExceptionHandler {
     /**
      * 系统错误 统一处理
      * 返回 500 错误码
+     * TableVersionNotFoundException 数据库中 乐观锁 version字段不存在
+     * IllegalArgumentException 参数不合法
+     * UploadErrorException 文件上传异常
+     * MultipartException 文件上传异常：上传文件不存在
      * @param request
      * @param ex
      * @return
      */
-    @ExceptionHandler(value = {TableVersionNotFoundException.class, IllegalArgumentException.class, UploadErrorException.class})
+    @ExceptionHandler(value = {
+            TableVersionNotFoundException.class,
+            IllegalArgumentException.class,
+            UploadErrorException.class,
+            MultipartException.class})
     public ResultFactory.Info tableVersionNotFoundException(NativeWebRequest request, RuntimeException ex) {
         logger.error(ex.getMessage());
         return ResultFactory.get500Info();
