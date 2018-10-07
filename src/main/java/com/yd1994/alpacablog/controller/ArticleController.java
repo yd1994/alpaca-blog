@@ -31,7 +31,7 @@ public class ArticleController extends BaseRestController<Article, ArticleServic
      */
     @GetMapping
     public ResultFactory.Collection<Article> list(RestRequestParam requestParam, Long categoryId) {
-        return this.articleService.listByCategoryId(categoryId, requestParam);
+        return this.articleService.list(requestParam, categoryId);
     }
 
 }
