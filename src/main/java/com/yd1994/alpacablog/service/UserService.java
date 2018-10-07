@@ -25,10 +25,10 @@ public interface UserService {
 
     /**
      * 修改密码
-     * @param newPassword 新密码
      * @param oldPassword 旧密码
+     * @param newPassword 新密码
      * @param id
      */
-    void updateUserPassword(String newPassword, String oldPassword, Long id);
+    void updateUserPassword(String oldPassword, String newPassword, String username);
 
 }

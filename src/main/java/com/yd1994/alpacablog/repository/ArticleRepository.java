@@ -14,9 +14,10 @@ public interface ArticleRepository extends JpaRepository<ArticleDO, Long>, JpaSp
     /**
      * 通过 id、delete 查找
      * @param id
-     * @param delete
+     * @param articleDODelete
+     * @param categoryDODelete
      * @return
      */
-    ArticleDO findFirstByIdAndDelete(Long id, Boolean delete);
+    ArticleDO findFirstByIdAndDeleteAndCategoryDODelete(Long id, Boolean articleDODelete, Boolean categoryDODelete);
 
 }
