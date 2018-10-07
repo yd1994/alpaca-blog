@@ -8,7 +8,9 @@ import com.yd1994.alpacablog.common.param.RestRequestParam;
 import com.yd1994.alpacablog.common.result.ResultFactory;
 import com.yd1994.alpacablog.dto.Article;
 import com.yd1994.alpacablog.entity.ArticleDO;
+import com.yd1994.alpacablog.entity.CategoryDO;
 import com.yd1994.alpacablog.repository.ArticleRepository;
+import com.yd1994.alpacablog.repository.CategoryRepository;
 import com.yd1994.alpacablog.service.ArticleService;
 import org.hibernate.StaleObjectStateException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,11 +41,13 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
 
     @Autowired
     private ArticleRepository articleRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @Cacheable(key = "#id", unless = "#result == null")
     @Override
     public Article get(Long id) {
-        ArticleDO articleDO = this.articleRepository.findFirstByIdAndDelete(id, false);
+        ArticleDO articleDO = this.articleRepository.findFirstByIdAndDeleteAndCategoryDODelete(id, false, false);
         if (articleDO == null) {
             throw new ResourceNotFoundException("Article：" + id + " 不存在。");
         }
@@ -75,6 +79,8 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
         Specification<ArticleDO> restRequestParamSpecification = this.getRestSpecification(requestParam);
         Specification<ArticleDO> categorySpecification = (Specification<ArticleDO>) (root, query, criteriaBuilder) -> {
             if (categoryId != null && categoryId > 0) {
+                Predicate idPredicate = criteriaBuilder.equal(root.join("categoryDO").get("id"), categoryId);
+                Predicate deletePredicate = criteriaBuilder.equal(root.join("categoryDO").get("delete"), false);
                 return criteriaBuilder.equal(root.join("categoryDO").get("id"), categoryId);
             }
             return null;
@@ -92,9 +98,14 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
         articleDO.setTraffic(0L);
         articleDO.setTop(false);
         articleDO.setDelete(false);
+        articleDO.setVersion(null);
         Date date = new Date();
         articleDO.setGmtCreated(date);
         articleDO.setGmtModified(date);
+        if (articleDO.getCategoryDO() != null && articleDO.getCategoryDO().getId() != null) {
+            CategoryDO categoryDO = this.categoryRepository.findFirstByIdAndDelete(articleDO.getCategoryDO().getId(), false);
+            articleDO.setCategoryDO(categoryDO);
+        }
         this.articleRepository.saveAndFlush(articleDO);
     }
 
@@ -107,6 +118,10 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
             ArticleDO sourceArticleDO = article.toEntity();
             this.copyForUpdate(sourceArticleDO, targetArticleDO);
             targetArticleDO.setGmtModified(new Date());
+            if (targetArticleDO.getCategoryDO() != null && targetArticleDO.getCategoryDO().getId() != null) {
+                CategoryDO categoryDO = this.categoryRepository.findFirstByIdAndDelete(targetArticleDO.getCategoryDO().getId(), false);
+                targetArticleDO.setCategoryDO(categoryDO);
+            }
             this.articleRepository.save(targetArticleDO);
         } catch (NoSuchElementException e) {
             throw new ResourceNotFoundException("Article：" + id + " 不存在。");
@@ -142,6 +157,9 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
         }
         if (sourceArticleDO.getTop() != null) {
             targetArticleDO.setTop(sourceArticleDO.getTop());
+        }
+        if (sourceArticleDO.getCategoryDO() != null) {
+            targetArticleDO.setCategoryDO(sourceArticleDO.getCategoryDO());
         }
     }
 

@@ -38,12 +38,11 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryDO> implements 
     @Override
     public Category get(Long id) {
         Optional<CategoryDO> optionalCategoryDO = this.categoryRepository.findById(id);
-        try {
-            CategoryDO categoryDO = optionalCategoryDO.get();
-            return new Category(categoryDO);
-        } catch (NoSuchElementException e) {
+        CategoryDO categoryDO = this.categoryRepository.findFirstByIdAndDelete(id, false);
+        if (categoryDO == null) {
             throw new ResourceNotFoundException("Category：" + id + " 不存在。");
         }
+        return new Category(categoryDO);
     }
 
     @Override

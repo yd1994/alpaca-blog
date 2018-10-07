@@ -6,9 +6,11 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -61,30 +63,43 @@ public abstract class BaseServiceImpl<E> {
             this.addRestSpecificationPredicateList(predicateList, root, criteriaBuilder, requestParam);
             Predicate[] p = new Predicate[predicateList.size()];
             query.where(criteriaBuilder.and(predicateList.toArray(p)));
+
+            List<Order> orderList = new ArrayList<>();
             if (!StringUtils.isEmpty(requestParam.getSortByAsc())) {
-                if ("created".equals(requestParam.getSortByAsc())) {
-                    requestParam.setSortByAsc("gmtCreated");
-                }
-                else if ("modified".equals(requestParam.getSortByAsc())) {
-                    requestParam.setSortByAsc("gmtModified");
-                }
-                query.orderBy(criteriaBuilder.asc(root.get(requestParam.getSortByAsc())));
+                String[] sortByAscArray = requestParam.getSortByAsc().split(",");
+                Arrays.asList(sortByAscArray).forEach(sortByAsc -> {
+                    sortByAsc = sortByAsc.trim();
+                    if ("created".equals(sortByAsc)) {
+                        sortByAsc = "gmtCreated";
+                    }
+                    else if ("modified".equals(sortByAsc)) {
+                        sortByAsc = "gmtModified";
+                    }
+                    orderList.add(criteriaBuilder.asc(root.get(sortByAsc)));
+                });
             }
             if (!StringUtils.isEmpty(requestParam.getSortByDesc())) {
-                if ("created".equals(requestParam.getSortByDesc())) {
-                    requestParam.setSortByDesc("gmtCreated");
-                }
-                else if ("modified".equals(requestParam.getSortByDesc())) {
-                    requestParam.setSortByDesc("gmtModified");
-                }
-                query.orderBy(criteriaBuilder.desc(root.get(requestParam.getSortByDesc())));
+                String[] sortByDescArray = requestParam.getSortByDesc().split(",");
+                Arrays.asList(sortByDescArray).forEach(sortByDesc -> {
+                    sortByDesc = sortByDesc.trim();
+                    if ("created".equals(sortByDesc)) {
+                        sortByDesc = "gmtCreated";
+                    }
+                    else if ("modified".equals(sortByDesc)) {
+                        sortByDesc = "gmtModified";
+                    }
+                    orderList.add(criteriaBuilder.desc(root.get(sortByDesc)));
+                });
+            }
+            if (orderList.size() > 0) {
+                query.orderBy(orderList);
             }
             return query.getRestriction();
         };
     }
 
     /**
-     *
+     * 自定义 Predicate
      *
      * @param predicateList
      * @param root
