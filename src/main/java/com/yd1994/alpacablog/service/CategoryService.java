@@ -14,6 +14,19 @@ import java.util.List;
  */
 public interface CategoryService extends BaseService<Category> {
 
+    /**
+     * 通过 requestParam 获取 Category列表 长度
+     *
+     * @param requestParam
+     * @return
+     */
+    Long listTotal(RestRequestParam requestParam);
+
+    /**
+     * 通过 requestParam 获取 Category列表
+     * @param requestParam
+     * @return
+     */
     ResultFactory.Collection<Category> list(RestRequestParam requestParam);
 
 }

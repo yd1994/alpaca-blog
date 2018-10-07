@@ -30,8 +30,20 @@ public class CategoryController extends BaseRestController<Category, CategorySer
         return this.categoryService.list(requestParam);
     }
 
+    @GetMapping("/total")
+    public ResultFactory.Info listTotal(RestRequestParam requestParam) {
+        Long total = this.categoryService.listTotal(requestParam);
+        return ResultFactory.get200Info().data(total);
+    }
+
     @GetMapping("/{categoryId}/articles")
     public ResultFactory.Collection<Article> listByCategoryId(RestRequestParam requestParam, @PathVariable("categoryId") Long categoryId) {
         return this.articleService.listByCategoryId(categoryId, requestParam);
+    }
+
+    @GetMapping("/{categoryId}/articles/total")
+    public ResultFactory.Info listByCategoryIdTotal(RestRequestParam requestParam, @PathVariable("categoryId") Long categoryId) {
+        Long total = this.articleService.total(requestParam, categoryId);
+        return ResultFactory.get200Info().data(total);
     }
 }

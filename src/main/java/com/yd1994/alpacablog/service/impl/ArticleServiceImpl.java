@@ -54,6 +54,26 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
         return new Article(articleDO);
     }
 
+    @Override
+    public Long total(RestRequestParam requestParam, Long categoryId) {
+        Specification<ArticleDO> restRequestParamSpecification = this.getRestSpecification(requestParam);
+        Specification<ArticleDO> categorySpecification = this.getSpecificationForCategory(categoryId);
+        Long articleTotal = this.articleRepository.count(
+                Specification.where(restRequestParamSpecification).and(categorySpecification));
+        return articleTotal;
+    }
+
+    private Specification<ArticleDO> getSpecificationForCategory(Long categoryId) {
+        Specification<ArticleDO> categorySpecification = (Specification<ArticleDO>) (root, query, criteriaBuilder) -> {
+            if (categoryId != null && categoryId > 0) {
+                Predicate idPredicate = criteriaBuilder.equal(root.join("categoryDO").get("id"), categoryId);
+                Predicate deletePredicate = criteriaBuilder.equal(root.join("categoryDO").get("delete"), false);
+                return criteriaBuilder.equal(root.join("categoryDO").get("id"), categoryId);
+            }
+            return null;
+        };
+        return categorySpecification;
+    }
 
     @Override
     protected void addRestSpecificationPredicateList(List<Predicate> predicateList, Root<ArticleDO> root,
@@ -70,21 +90,14 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
 
     @Override
     public ResultFactory.Collection<Article> list(RestRequestParam requestParam, Long categoryId) {
-        return this.listByCategoryId(categoryId,requestParam);
+        return this.listByCategoryId(categoryId, requestParam);
     }
 
     @Override
     public ResultFactory.Collection<Article> listByCategoryId(Long categoryId, RestRequestParam requestParam) {
         Pageable pageable = requestParam.getPageable();
         Specification<ArticleDO> restRequestParamSpecification = this.getRestSpecification(requestParam);
-        Specification<ArticleDO> categorySpecification = (Specification<ArticleDO>) (root, query, criteriaBuilder) -> {
-            if (categoryId != null && categoryId > 0) {
-                Predicate idPredicate = criteriaBuilder.equal(root.join("categoryDO").get("id"), categoryId);
-                Predicate deletePredicate = criteriaBuilder.equal(root.join("categoryDO").get("delete"), false);
-                return criteriaBuilder.equal(root.join("categoryDO").get("id"), categoryId);
-            }
-            return null;
-        };
+        Specification<ArticleDO> categorySpecification = this.getSpecificationForCategory(categoryId);
         Page<ArticleDO> articlePage = this.articleRepository.findAll(
                 Specification.where(restRequestParamSpecification).and(categorySpecification), pageable);
         List<Article> articleList = new ArrayList<>(articlePage.getContent().size());

@@ -46,6 +46,11 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryDO> implements 
     }
 
     @Override
+    public Long listTotal(RestRequestParam requestParam) {
+        return this.categoryRepository.count(this.getRestSpecification(requestParam));
+    }
+
+    @Override
     public ResultFactory.Collection<Category> list(RestRequestParam requestParam) {
         Pageable pageable = requestParam.getPageable();
         Page<CategoryDO> categoryDOPage = this.categoryRepository.findAll(this.getRestSpecification(requestParam), pageable);

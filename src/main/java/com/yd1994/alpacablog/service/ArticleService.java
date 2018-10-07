@@ -19,10 +19,21 @@ import java.util.List;
 public interface ArticleService extends BaseService<Article> {
 
     /**
+     * 通过 RestRequestParam，categoryId 获取 Article的总数量
+     *
+     * @param requestParam
+     * @param categoryId
+     * @return
+     */
+    public Long total(RestRequestParam requestParam, Long categoryId);
+
+    /**
      * 通过 RestRequestParam，categoryId 获取 Article
      *
-     * sortByAsc, sortByDesc 可选参数 id, title, content, summary, traffic
-     * beforeBy, afterBy 可选参数 created, modified
+     * sortByAsc, sortByDesc 排序
+     * 可选参数 id, title, content, summary, traffic，created, modified 多个排序可用 created,modified
+     * before, after 参数为时间 与 beforeBy, afterB 配套使用
+     * beforeBy, afterBy 可选参数 created, modified 与 before, after配套使用
      *
      * categoryId: 可为空
      *
