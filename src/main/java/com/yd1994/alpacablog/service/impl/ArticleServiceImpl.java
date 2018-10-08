@@ -125,20 +125,19 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
     @CacheEvict(key = "#id")
     @Override
     public void update(Article article, Long id) {
-        Optional<ArticleDO> optionalArticleDO = this.articleRepository.findById(id);
-        try {
-            ArticleDO targetArticleDO = optionalArticleDO.get();
-            ArticleDO sourceArticleDO = article.toEntity();
-            this.copyForUpdate(sourceArticleDO, targetArticleDO);
-            targetArticleDO.setGmtModified(new Date());
-            if (targetArticleDO.getCategoryDO() != null && targetArticleDO.getCategoryDO().getId() != null) {
-                CategoryDO categoryDO = this.categoryRepository.findFirstByIdAndDelete(targetArticleDO.getCategoryDO().getId(), false);
-                targetArticleDO.setCategoryDO(categoryDO);
-            }
-            this.articleRepository.save(targetArticleDO);
-        } catch (NoSuchElementException e) {
+        ArticleDO articleDO = this.articleRepository.findFirstByIdAndDeleteAndCategoryDODelete(id, false, false);
+        if (articleDO == null) {
             throw new ResourceNotFoundException("Article：" + id + " 不存在。");
         }
+        ArticleDO targetArticleDO = articleDO;
+        ArticleDO sourceArticleDO = article.toEntity();
+        this.copyForUpdate(sourceArticleDO, targetArticleDO);
+        targetArticleDO.setGmtModified(new Date());
+        if (targetArticleDO.getCategoryDO() != null && targetArticleDO.getCategoryDO().getId() != null) {
+            CategoryDO categoryDO = this.categoryRepository.findFirstByIdAndDelete(targetArticleDO.getCategoryDO().getId(), false);
+            targetArticleDO.setCategoryDO(categoryDO);
+        }
+        this.articleRepository.save(targetArticleDO);
     }
 
     /**
@@ -179,15 +178,13 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
     @CacheEvict(key = "#id")
     @Override
     public void delete(Long id) {
-        Optional<ArticleDO> optionalArticleDO = this.articleRepository.findById(id);
-        try {
-            ArticleDO targetArticleDO = optionalArticleDO.get();
-            targetArticleDO.setDelete(true);
-            targetArticleDO.setGmtModified(new Date());
-            this.articleRepository.save(targetArticleDO);
-        } catch (NoSuchElementException e) {
+        ArticleDO articleDO = this.articleRepository.findFirstByIdAndDeleteAndCategoryDODelete(id, false, false);
+        if (articleDO == null) {
             throw new ResourceNotFoundException("Article：" + id + " 不存在。");
         }
+        articleDO.setDelete(true);
+        articleDO.setGmtModified(new Date());
+        this.articleRepository.save(articleDO);
     }
 
 }

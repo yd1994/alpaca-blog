@@ -37,7 +37,6 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryDO> implements 
     @Cacheable(key = "#id", unless = "#result == null")
     @Override
     public Category get(Long id) {
-        Optional<CategoryDO> optionalCategoryDO = this.categoryRepository.findById(id);
         CategoryDO categoryDO = this.categoryRepository.findFirstByIdAndDelete(id, false);
         if (categoryDO == null) {
             throw new ResourceNotFoundException("Category：" + id + " 不存在。");
@@ -80,16 +79,15 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryDO> implements 
     @CacheEvict(key = "#id")
     @Override
     public void update(Category category, Long id) {
-        Optional<CategoryDO> optionalCategoryDO = this.categoryRepository.findById(id);
-        try {
-            CategoryDO targetCategoryDO = optionalCategoryDO.get();
-            CategoryDO sourceCategoryDO = category.toEntity();
-            this.copyForUpdate(sourceCategoryDO, targetCategoryDO);
-            targetCategoryDO.setGmtModified(new Date());
-            this.categoryRepository.save(targetCategoryDO);
-        } catch (NoSuchElementException e) {
+        CategoryDO categoryDO = this.categoryRepository.findFirstByIdAndDelete(id, false);
+        if (categoryDO == null) {
             throw new ResourceNotFoundException("Category：" + id + " 不存在。");
         }
+        CategoryDO targetCategoryDO = categoryDO;
+        CategoryDO sourceCategoryDO = category.toEntity();
+        this.copyForUpdate(sourceCategoryDO, targetCategoryDO);
+        targetCategoryDO.setGmtModified(new Date());
+        this.categoryRepository.save(targetCategoryDO);
     }
 
 
@@ -125,15 +123,13 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryDO> implements 
     @CacheEvict(key = "#id")
     @Override
     public void delete(Long id) {
-        Optional<CategoryDO> optionalCategoryDO = this.categoryRepository.findById(id);
-        try {
-            CategoryDO targetCategoryDO = optionalCategoryDO.get();
-            targetCategoryDO.setDelete(true);
-            targetCategoryDO.setGmtModified(new Date());
-            this.categoryRepository.save(targetCategoryDO);
-        } catch (NoSuchElementException e) {
+        CategoryDO categoryDO = this.categoryRepository.findFirstByIdAndDelete(id, false);
+        if (categoryDO == null) {
             throw new ResourceNotFoundException("Category：" + id + " 不存在。");
         }
+        categoryDO.setDelete(true);
+        categoryDO.setGmtModified(new Date());
+        this.categoryRepository.save(categoryDO);
     }
 
 }

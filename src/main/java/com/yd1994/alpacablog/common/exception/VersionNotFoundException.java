@@ -8,6 +8,7 @@ package com.yd1994.alpacablog.common.exception;
 public class VersionNotFoundException extends NullPointerException {
 
     public VersionNotFoundException() {
+        this("version不能为空。");
     }
 
     public VersionNotFoundException(String s) {
