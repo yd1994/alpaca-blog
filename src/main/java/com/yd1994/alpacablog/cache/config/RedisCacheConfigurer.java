@@ -34,12 +34,14 @@ public class RedisCacheConfigurer extends CachingConfigurerSupport {
         Set<String> cacheNames = new HashSet<>();
         cacheNames.add("articles");
         cacheNames.add("categories");
+        cacheNames.add("sys_information");
         cacheNames.add("oauth_client_detail");
         cacheNames.add("users");
 
         Map<String, RedisCacheConfiguration> cacheConfigurationMap = new HashMap<>();
         cacheConfigurationMap.put("articles", redisCacheConfigurationEntity);
         cacheConfigurationMap.put("categories", redisCacheConfigurationEntity);
+        cacheConfigurationMap.put("sys_information", redisCacheConfigurationEntity);
         cacheConfigurationMap.put("oauth_client_detail", sysConfiguration);
         cacheConfigurationMap.put("users", sysConfiguration);
 
