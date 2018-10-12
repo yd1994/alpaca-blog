@@ -9,13 +9,17 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.List;
 
+/**
+ * @author yd
+ */
 public interface ArticleRepository extends JpaRepository<ArticleDO, Long>, JpaSpecificationExecutor<ArticleDO> {
 
     /**
-     * 通过 id、delete 查找
-     * @param id
-     * @param articleDODelete
-     * @param categoryDODelete
+     * 查询　{@link ArticleDO}
+     *
+     * @param id articleDO的id {@link ArticleDO#id}
+     * @param articleDODelete articleDO delete　{@link ArticleDO#delete}
+     * @param categoryDODelete categoryDO delete　{@link com.yd1994.alpacablog.entity.CategoryDO#delete}
      * @return
      */
     ArticleDO findFirstByIdAndDeleteAndCategoryDODelete(Long id, Boolean articleDODelete, Boolean categoryDODelete);

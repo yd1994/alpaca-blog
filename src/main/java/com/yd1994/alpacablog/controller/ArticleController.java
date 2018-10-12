@@ -20,13 +20,33 @@ public class ArticleController extends BaseRestController<Article, ArticleServic
     private ArticleService articleService;
 
     /**
-     * 获取 Article 集合
-     * page 默认：1 必须 大于 0
-     * size 默认：10 必须 大于 0
-     * sortByAsc, sortByDesc 可选参数 id, title, content, summary, traffic, created, modified
-     * beforeBy, afterBy 可选参数 created, modified
+     * 查询博文集合
+     *
+     * 可传递参数：sortByAsc, sortByDesc, before, beforeBy, after, afterBy, page, size, categoryId
+     *
+     * page 分页。页码。默认1。
+     * size 分页。每页记录。默认10。
+     *
+     * sortByAsc, sortByDesc 排序
+     * sortByAsc 正序
+     * sortByDesc 反序
+     * 可选参数 id, title, content, summary, traffic，created, modified
+     * 多个排序可用 created,modified （SQL同规则）
+     *
+     * before、beforeBy， after、afterBy 筛选在什么时间之前/之后的记录
+     *   before、beforeBy 必须同时存在。在什么时候之前的记录
+     *     before 时间
+     *     beforeBy 什么规则，可选created（创建时间），modified（最后修改时间）
+     *   after、afterBy 必须同时存在。在什么时候之后的记录
+     *     after 时间
+     *     afterBy 什么规则，可选created（创建时间），modified（最后修改时间）
+     *
+     * view 用于搜索，可搜索字段 title, content
+     *
+     * categoryId 分类id，通过分类id筛选
      *
      * @param requestParam
+     * @param categoryId
      * @return
      */
     @GetMapping
@@ -34,6 +54,15 @@ public class ArticleController extends BaseRestController<Article, ArticleServic
         return this.articleService.list(requestParam, categoryId);
     }
 
+    /**
+     * 查询博文集合总数
+     *
+     * 参数: {@link ArticleController#list(RestRequestParam, Long)}
+     *
+     * @param requestParam
+     * @param categoryId
+     * @return
+     */
     @GetMapping("/total")
     public ResultFactory.Info listTotal(RestRequestParam requestParam, Long categoryId) {
         Long total = this.articleService.total(requestParam, categoryId);

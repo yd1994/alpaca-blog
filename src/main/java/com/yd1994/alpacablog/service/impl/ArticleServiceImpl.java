@@ -81,7 +81,7 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
         if (!StringUtils.isEmpty(requestParam.getView())) {
             Predicate titlePredicate = criteriaBuilder.like(root.get("title")
                     .as(String.class), "%" + requestParam.getView() + "%");
-            Predicate contentPredicate = criteriaBuilder.like(root.get("title")
+            Predicate contentPredicate = criteriaBuilder.like(root.get("content")
                             .as(String.class), "%" + requestParam.getView() + "%");
             Predicate p = criteriaBuilder.or(titlePredicate, contentPredicate);
             predicateList.add(p);
