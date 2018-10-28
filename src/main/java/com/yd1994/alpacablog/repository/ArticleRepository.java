@@ -1,13 +1,13 @@
 package com.yd1994.alpacablog.repository;
 
 import com.yd1994.alpacablog.entity.ArticleDO;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-import java.util.List;
+import javax.transaction.Transactional;
 
 /**
  * @author yd
@@ -23,5 +23,15 @@ public interface ArticleRepository extends JpaRepository<ArticleDO, Long>, JpaSp
      * @return
      */
     ArticleDO findFirstByIdAndDeleteAndCategoryDODelete(Long id, Boolean articleDODelete, Boolean categoryDODelete);
+
+    /**
+     * 添加阅读量
+     *
+     * @param id {@link ArticleDO#id}
+     */
+    @Transactional
+    @Modifying
+    @Query("update ArticleDO a set a.traffic = a.traffic + 1 where a.id = :id")
+    void addArticleTraffic(@Param("id") Long id);
 
 }

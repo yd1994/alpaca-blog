@@ -51,4 +51,10 @@ public interface ArticleService extends BaseService<Article> {
      */
     ResultFactory.Collection<Article> listByCategoryId(Long categoryId, RestRequestParam requestParam);
 
+    /**
+     * 添加点击量
+     * @param id
+     */
+    void addArticleTraffic(Long id);
+
 }

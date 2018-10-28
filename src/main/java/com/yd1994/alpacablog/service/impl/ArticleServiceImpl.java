@@ -28,6 +28,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.transaction.Transactional;
 import java.util.*;
 
 /**
@@ -51,6 +52,7 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
         if (articleDO == null) {
             throw new ResourceNotFoundException("Article：" + id + " 不存在。");
         }
+        this.addArticleTraffic(id);
         return new Article(articleDO);
     }
 
@@ -173,6 +175,12 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
         if (sourceArticleDO.getCategoryDO() != null) {
             targetArticleDO.setCategoryDO(sourceArticleDO.getCategoryDO());
         }
+    }
+
+    @CacheEvict(key = "#id")
+    @Override
+    public void addArticleTraffic(Long id) {
+        this.articleRepository.addArticleTraffic(id);
     }
 
     @CacheEvict(key = "#id")
