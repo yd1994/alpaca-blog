@@ -38,8 +38,8 @@ public class ResourceServerConfigurer extends ResourceServerConfigurerAdapter {
                 // permitAll 开放所有权限
                 // 则 .antMatchers(HttpMethod.GET).permitAll().antMatchers(HttpMethod.GET， “/user/**”).permitAll()
                 // antMatchers(HttpMethod.GET， “/user/**”) 无效
-                // 对get请求开放权限
                 .antMatchers("/user/**").authenticated()
+                // 对get请求开放权限
                 .antMatchers(HttpMethod.GET).permitAll()
                 // post请求需要认证
                 .antMatchers(HttpMethod.POST).authenticated()
