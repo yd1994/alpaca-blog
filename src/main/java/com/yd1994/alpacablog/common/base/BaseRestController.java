@@ -17,8 +17,8 @@ public abstract class BaseRestController<T, E extends BaseService<T>> {
     private E e;
 
     @GetMapping("/{id}")
-    public T get(@PathVariable Long id) {
-        return this.e.get(id);
+    public ResultFactory.Info get(@PathVariable Long id) {
+        return ResultFactory.get200Info().data(this.e.get(id));
     }
 
     @PostMapping

@@ -27,6 +27,6 @@ public interface CategoryService extends BaseService<Category> {
      * @param requestParam
      * @return
      */
-    ResultFactory.Collection<Category> list(RestRequestParam requestParam);
+    ResultFactory.CollectionData<Category> list(RestRequestParam requestParam);
 
 }

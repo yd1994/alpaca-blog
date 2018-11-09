@@ -94,7 +94,7 @@ public class RestExceptionHandler {
             NoSuchElementException.class,
             EmptyResultDataAccessException.class})
     public ResultFactory.Info sourceNotFoundException(NativeWebRequest request, Exception ex) {
-        logger.debug(ex.getMessage());
+        logger.info(ex.getMessage());
         return ResultFactory.get404Info();
     }
 

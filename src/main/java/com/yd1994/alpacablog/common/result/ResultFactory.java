@@ -186,41 +186,27 @@ public class ResultFactory implements Serializable {
         }
     }
 
-    /**
-     * 获取 集合的返回信息
-     * @param data
-     * @param total
-     * @param <T>
-     * @return
-     */
-    public static <T> Collection<T> getCollection(List<T> data, Long total) {
-        return new Collection<T>(data, total);
-    }
-
-    /**
-     * 集合的返回信息
-     * @param <T>
-     */
-    public static class Collection<T> implements Serializable {
-
-        private List<T> data;
-        private Long total;
+    public static class CollectionData<T> implements Serializable {
 
         /**
-         *
-         * @param data 集合
-         * @param total 总数量
+         * 分页后的集合
          */
-        public Collection(List<T> data, Long total) {
+        private Collection<T> data;
+        /**
+         * 集合的总数
+         */
+        private Long total;
+
+        public CollectionData(Collection<T> data, Long total) {
             this.data = data;
             this.total = total;
         }
 
-        public List<T> getData() {
+        public Collection<T> getData() {
             return data;
         }
 
-        public void setData(List<T> data) {
+        public void setData(Collection<T> data) {
             this.data = data;
         }
 
@@ -231,7 +217,18 @@ public class ResultFactory implements Serializable {
         public void setTotal(Long total) {
             this.total = total;
         }
+
+        @Override
+        public String toString() {
+            return "CollectionData{" +
+                    "data=" + data +
+                    ", total=" + total +
+                    '}';
+        }
     }
 
+    public static <T> CollectionData<T> getCollectionData(Collection<T> data, Long total) {
+        return new CollectionData<T>(data, total);
+    }
 
 }

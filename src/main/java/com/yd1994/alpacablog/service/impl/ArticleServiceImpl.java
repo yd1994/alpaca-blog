@@ -21,6 +21,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -44,6 +45,8 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
     private ArticleRepository articleRepository;
     @Autowired
     private CategoryRepository categoryRepository;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Cacheable(key = "#id", unless = "#result == null")
     @Override
@@ -52,7 +55,11 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
         if (articleDO == null) {
             throw new ResourceNotFoundException("Article：" + id + " 不存在。");
         }
-        this.addArticleTraffic(id);
+        String trafficNameInRedis = "articles::" + id + ":traffic";
+        Object traffic = this.redisTemplate.opsForValue().get(trafficNameInRedis);
+        if (traffic == null) {
+            this.articleRepository.setArticleTraffic(id, articleDO.getTraffic());
+        }
         return new Article(articleDO);
     }
 
@@ -90,13 +97,10 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
         }
     }
 
+    // @Cacheable(keyGenerator = "customKeyGenerator", unless = "#result == null")
+    // 在添加、修改或删除后，如何高效的清除缓存待考虑
     @Override
-    public ResultFactory.Collection<Article> list(RestRequestParam requestParam, Long categoryId) {
-        return this.listByCategoryId(categoryId, requestParam);
-    }
-
-    @Override
-    public ResultFactory.Collection<Article> listByCategoryId(Long categoryId, RestRequestParam requestParam) {
+    public ResultFactory.CollectionData<Article> listByCategoryId(Long categoryId, RestRequestParam requestParam) {
         Pageable pageable = requestParam.getPageable();
         Specification<ArticleDO> restRequestParamSpecification = this.getRestSpecification(requestParam);
         Specification<ArticleDO> categorySpecification = this.getSpecificationForCategory(categoryId);
@@ -104,7 +108,7 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
                 Specification.where(restRequestParamSpecification).and(categorySpecification), pageable);
         List<Article> articleList = new ArrayList<>(articlePage.getContent().size());
         articlePage.getContent().forEach(articleDO -> articleList.add(new Article(articleDO)));
-        return ResultFactory.getCollection(articleList, articlePage.getTotalElements());
+        return ResultFactory.getCollectionData(articleList, articlePage.getTotalElements());
     }
 
     @Override
@@ -177,10 +181,15 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
         }
     }
 
-    @CacheEvict(key = "#id")
     @Override
-    public void addArticleTraffic(Long id) {
-        this.articleRepository.addArticleTraffic(id);
+    public Long addAndGetArticleTraffic(Long id) {
+        String trafficNameInRedis = "articles::" + id + ":traffic";
+        Long traffic = (Long) this.redisTemplate.opsForValue().increment(trafficNameInRedis, 1L);
+        if (traffic % 10 == 0) {
+            // 当访问量为10的倍数，持久化到
+            this.articleRepository.setArticleTraffic(id, traffic);
+        }
+        return traffic;
     }
 
     @CacheEvict(key = "#id")

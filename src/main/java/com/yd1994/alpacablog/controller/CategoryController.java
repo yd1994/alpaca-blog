@@ -26,8 +26,8 @@ public class CategoryController extends BaseRestController<Category, CategorySer
     private ArticleService articleService;
 
     @GetMapping
-    public ResultFactory.Collection<Category> list(RestRequestParam requestParam) {
-        return this.categoryService.list(requestParam);
+    public ResultFactory.Info list(RestRequestParam requestParam) {
+        return ResultFactory.get200Info().data(this.categoryService.list(requestParam));
     }
 
     @GetMapping("/total")
@@ -37,8 +37,8 @@ public class CategoryController extends BaseRestController<Category, CategorySer
     }
 
     @GetMapping("/{categoryId}/articles")
-    public ResultFactory.Collection<Article> listByCategoryId(RestRequestParam requestParam, @PathVariable("categoryId") Long categoryId) {
-        return this.articleService.listByCategoryId(categoryId, requestParam);
+    public ResultFactory.Info listByCategoryId(RestRequestParam requestParam, @PathVariable("categoryId") Long categoryId) {
+        return ResultFactory.get200Info().data(this.articleService.listByCategoryId(categoryId, requestParam));
     }
 
     @GetMapping("/{categoryId}/articles/total")

@@ -50,12 +50,12 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryDO> implements 
     }
 
     @Override
-    public ResultFactory.Collection<Category> list(RestRequestParam requestParam) {
+    public ResultFactory.CollectionData<Category> list(RestRequestParam requestParam) {
         Pageable pageable = requestParam.getPageable();
         Page<CategoryDO> categoryDOPage = this.categoryRepository.findAll(this.getRestSpecification(requestParam), pageable);
         List<Category> categoryList = new ArrayList<>(categoryDOPage.getContent().size());
         categoryDOPage.getContent().forEach(categoryDO -> categoryList.add(new Category(categoryDO)));
-        return ResultFactory.getCollection(categoryList, categoryDOPage.getTotalElements());
+        return ResultFactory.getCollectionData(categoryList, categoryDOPage.getTotalElements());
     }
 
 

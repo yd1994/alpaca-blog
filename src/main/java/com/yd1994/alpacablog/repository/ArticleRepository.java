@@ -25,13 +25,14 @@ public interface ArticleRepository extends JpaRepository<ArticleDO, Long>, JpaSp
     ArticleDO findFirstByIdAndDeleteAndCategoryDODelete(Long id, Boolean articleDODelete, Boolean categoryDODelete);
 
     /**
-     * 添加阅读量
+     * 设置阅读量
      *
      * @param id {@link ArticleDO#id}
+     * @param traffic {@link ArticleDO#traffic}
      */
     @Transactional
     @Modifying
-    @Query("update ArticleDO a set a.traffic = a.traffic + 1 where a.id = :id")
-    void addArticleTraffic(@Param("id") Long id);
+    @Query("update ArticleDO a set a.traffic = :traffic where a.id = :id")
+    void setArticleTraffic(@Param("id") Long id, @Param("traffic") Long traffic);
 
 }
