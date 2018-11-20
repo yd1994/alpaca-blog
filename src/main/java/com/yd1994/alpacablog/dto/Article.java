@@ -2,10 +2,14 @@ package com.yd1994.alpacablog.dto;
 
 import com.yd1994.alpacablog.common.base.BaseDTO;
 import com.yd1994.alpacablog.entity.ArticleDO;
+import com.yd1994.alpacablog.entity.ArticleTagDO;
 import org.springframework.beans.BeanUtils;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * dto 博文
@@ -55,6 +59,11 @@ public class Article extends BaseDTO<ArticleDO> implements Serializable {
      */
     private Category category;
 
+    /**
+     * 标签
+     */
+    private List<ArticleTag> articleTagList;
+
     public Article() {
     }
 
@@ -70,6 +79,13 @@ public class Article extends BaseDTO<ArticleDO> implements Serializable {
             this.modified = articleDO.getGmtModified();
             // 分类转换
             this.category = new Category(articleDO.getCategoryDO());
+            if (articleDO.getArticleTagDOList() != null) {
+                this.articleTagList = new ArrayList<>(articleDO.getArticleTagDOList().size());
+                articleDO.getArticleTagDOList().stream()
+                        // 过滤被删除标签
+                        .filter(articleTagDO -> articleTagDO.getDelete() != true)
+                        .forEach(articleTagDO -> this.articleTagList.add(new ArticleTag(articleTagDO)));
+            }
         }
     }
 
@@ -85,6 +101,11 @@ public class Article extends BaseDTO<ArticleDO> implements Serializable {
         articleDO.setGmtModified(this.getModified());
         if (this.getCategory() != null) {
             articleDO.setCategoryDO(this.getCategory().toEntity());
+        }
+        if (this.articleTagList != null) {
+            List<ArticleTagDO> articleTagDOList = new ArrayList<>(this.articleTagList.size());
+            this.articleTagList.forEach(articleTag -> articleTagDOList.add(articleTag.toEntity()));
+            articleDO.setArticleTagDOList(articleTagDOList);
         }
         return articleDO;
     }
@@ -170,6 +191,14 @@ public class Article extends BaseDTO<ArticleDO> implements Serializable {
         this.category = category;
     }
 
+    public List<ArticleTag> getArticleTagList() {
+        return articleTagList;
+    }
+
+    public void setArticleTagList(List<ArticleTag> articleTagList) {
+        this.articleTagList = articleTagList;
+    }
+
     @Override
     public String toString() {
         return "Article{" +
@@ -183,6 +212,7 @@ public class Article extends BaseDTO<ArticleDO> implements Serializable {
                 ", created=" + created +
                 ", modified=" + modified +
                 ", category=" + category +
+                ", articleTagList=" + articleTagList +
                 '}';
     }
 }

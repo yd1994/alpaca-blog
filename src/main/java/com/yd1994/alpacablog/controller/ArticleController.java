@@ -78,7 +78,7 @@ public class ArticleController extends BaseRestController<Article, ArticleServic
      */
     @GetMapping("/total")
     public ResultFactory.Info listTotal(RestRequestParam requestParam, Long categoryId) {
-        Long total = this.articleService.total(requestParam, categoryId);
+        Long total = this.articleService.totalByCategoryId(requestParam, categoryId);
         return ResultFactory.get200Info().data(total);
     }
 

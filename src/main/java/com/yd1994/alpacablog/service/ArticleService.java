@@ -25,7 +25,7 @@ public interface ArticleService extends BaseService<Article> {
      * @param categoryId
      * @return
      */
-    public Long total(RestRequestParam requestParam, Long categoryId);
+    Long totalByCategoryId(RestRequestParam requestParam, Long categoryId);
 
     /**
      * 查询博文集合
@@ -58,6 +58,22 @@ public interface ArticleService extends BaseService<Article> {
      * @return
      */
     ResultFactory.CollectionData<Article> listByCategoryId(Long categoryId, RestRequestParam requestParam);
+
+    /**
+     * 通过 requestParam， articleTagId 获取总量
+     * @param requestParam
+     * @param articleTagId
+     * @return
+     */
+    Long totalByArticleTagId(RestRequestParam requestParam, Long articleTagId);
+
+    /**
+     * 通过 requestParam， articleTagId 获取
+     * @param articleTagId
+     * @param requestParam
+     * @return
+     */
+    ResultFactory.CollectionData<Article> listByArticleTagId(Long articleTagId, RestRequestParam requestParam);
 
     /**
      * 添加点击量

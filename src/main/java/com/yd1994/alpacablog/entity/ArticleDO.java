@@ -1,5 +1,6 @@
 package com.yd1994.alpacablog.entity;
 
+import com.yd1994.alpacablog.dto.ArticleTag;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -8,6 +9,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 博文
@@ -84,6 +86,15 @@ public class ArticleDO implements Serializable {
             joinColumns = {@JoinColumn(name = "articleId", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "categoryId", referencedColumnName = "id")})
     private CategoryDO categoryDO;
+
+    /**
+     * 标签
+     */
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "alpaca_blog_article_article_tag",
+            joinColumns = {@JoinColumn(name = "articleId", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "articleTagId", referencedColumnName = "id")})
+    private List<ArticleTagDO> articleTagDOList;
 
     public Long getId() {
         return id;
@@ -190,6 +201,14 @@ public class ArticleDO implements Serializable {
         this.categoryDO = categoryDO;
     }
 
+    public List<ArticleTagDO> getArticleTagDOList() {
+        return articleTagDOList;
+    }
+
+    public void setArticleTagDOList(List<ArticleTagDO> articleTagDOList) {
+        this.articleTagDOList = articleTagDOList;
+    }
+
     @Override
     public String toString() {
         return "ArticleDO{" +
@@ -206,6 +225,7 @@ public class ArticleDO implements Serializable {
                 ", gmtModified=" + gmtModified +
                 ", modifiedBy='" + modifiedBy + '\'' +
                 ", categoryDO=" + categoryDO +
+                ", articleTagDOList=" + articleTagDOList +
                 '}';
     }
 }

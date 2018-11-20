@@ -8,8 +8,10 @@ import com.yd1994.alpacablog.common.param.RestRequestParam;
 import com.yd1994.alpacablog.common.result.ResultFactory;
 import com.yd1994.alpacablog.dto.Article;
 import com.yd1994.alpacablog.entity.ArticleDO;
+import com.yd1994.alpacablog.entity.ArticleTagDO;
 import com.yd1994.alpacablog.entity.CategoryDO;
 import com.yd1994.alpacablog.repository.ArticleRepository;
+import com.yd1994.alpacablog.repository.ArticleTagRepository;
 import com.yd1994.alpacablog.repository.CategoryRepository;
 import com.yd1994.alpacablog.service.ArticleService;
 import org.hibernate.StaleObjectStateException;
@@ -44,6 +46,8 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
     @Autowired
     private ArticleRepository articleRepository;
     @Autowired
+    private ArticleTagRepository articleTagRepository;
+    @Autowired
     private CategoryRepository categoryRepository;
     @Autowired
     private RedisTemplate redisTemplate;
@@ -63,15 +67,6 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
         return new Article(articleDO);
     }
 
-    @Override
-    public Long total(RestRequestParam requestParam, Long categoryId) {
-        Specification<ArticleDO> restRequestParamSpecification = this.getRestSpecification(requestParam);
-        Specification<ArticleDO> categorySpecification = this.getSpecificationForCategory(categoryId);
-        Long articleTotal = this.articleRepository.count(
-                Specification.where(restRequestParamSpecification).and(categorySpecification));
-        return articleTotal;
-    }
-
     private Specification<ArticleDO> getSpecificationForCategory(Long categoryId) {
         Specification<ArticleDO> categorySpecification = (Specification<ArticleDO>) (root, query, criteriaBuilder) -> {
             if (categoryId != null && categoryId > 0) {
@@ -82,6 +77,18 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
             return null;
         };
         return categorySpecification;
+    }
+
+    private Specification<ArticleDO> getSpecificationForArticleTag(Long articleTagId) {
+        Specification<ArticleDO> articleTagSpecification = (Specification<ArticleDO>) (root, query, criteriaBuilder) -> {
+            if (articleTagId != null && articleTagId > 0) {
+                Predicate idPredicate = criteriaBuilder.equal(root.join("articleTagDO").get("id"), articleTagId);
+                Predicate deletePredicate = criteriaBuilder.equal(root.join("articleTagDO").get("delete"), false);
+                return criteriaBuilder.equal(root.join("articleTagDO").get("id"), articleTagId);
+            }
+            return null;
+        };
+        return articleTagSpecification;
     }
 
     @Override
@@ -97,17 +104,55 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
         }
     }
 
+    @Override
+    public Long totalByCategoryId(RestRequestParam requestParam, Long categoryId) {
+        Specification<ArticleDO> restRequestParamSpecification = this.getRestSpecification(requestParam);
+        Specification<ArticleDO> categorySpecification = this.getSpecificationForCategory(categoryId);
+        Long articleTotal = this.articleRepository.count(
+                Specification.where(restRequestParamSpecification).and(categorySpecification));
+        return articleTotal;
+    }
+
     // @Cacheable(keyGenerator = "customKeyGenerator", unless = "#result == null")
     // 在添加、修改或删除后，如何高效的清除缓存待考虑
     @Override
     public ResultFactory.CollectionData<Article> listByCategoryId(Long categoryId, RestRequestParam requestParam) {
         Pageable pageable = requestParam.getPageable();
+
         Specification<ArticleDO> restRequestParamSpecification = this.getRestSpecification(requestParam);
         Specification<ArticleDO> categorySpecification = this.getSpecificationForCategory(categoryId);
+
         Page<ArticleDO> articlePage = this.articleRepository.findAll(
                 Specification.where(restRequestParamSpecification).and(categorySpecification), pageable);
+
         List<Article> articleList = new ArrayList<>(articlePage.getContent().size());
         articlePage.getContent().forEach(articleDO -> articleList.add(new Article(articleDO)));
+
+        return ResultFactory.getCollectionData(articleList, articlePage.getTotalElements());
+    }
+
+    @Override
+    public Long totalByArticleTagId(RestRequestParam requestParam, Long articleTagId) {
+        Specification<ArticleDO> restRequestParamSpecification = this.getRestSpecification(requestParam);
+        Specification<ArticleDO> articleTagSpecification = this.getSpecificationForArticleTag(articleTagId);
+        Long articleTotal = this.articleRepository.count(
+                Specification.where(restRequestParamSpecification).and(articleTagSpecification));
+        return articleTotal;
+    }
+
+    @Override
+    public ResultFactory.CollectionData<Article> listByArticleTagId(Long articleTagId, RestRequestParam requestParam) {
+        Pageable pageable = requestParam.getPageable();
+
+        Specification<ArticleDO> restRequestParamSpecification = this.getRestSpecification(requestParam);
+        Specification<ArticleDO> categorySpecification = this.getSpecificationForArticleTag(articleTagId);
+
+        Page<ArticleDO> articlePage = this.articleRepository.findAll(
+                Specification.where(restRequestParamSpecification).and(categorySpecification), pageable);
+
+        List<Article> articleList = new ArrayList<>(articlePage.getContent().size());
+        articlePage.getContent().forEach(articleDO -> articleList.add(new Article(articleDO)));
+
         return ResultFactory.getCollectionData(articleList, articlePage.getTotalElements());
     }
 
@@ -142,6 +187,14 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
         if (targetArticleDO.getCategoryDO() != null && targetArticleDO.getCategoryDO().getId() != null) {
             CategoryDO categoryDO = this.categoryRepository.findFirstByIdAndDelete(targetArticleDO.getCategoryDO().getId(), false);
             targetArticleDO.setCategoryDO(categoryDO);
+        }
+        if (targetArticleDO.getArticleTagDOList() != null) {
+            List<ArticleTagDO> articleTagDOList = targetArticleDO.getArticleTagDOList();
+            for (int i = 0; i < articleTagDOList.size(); i++) {
+                if (articleTagDOList.get(i).getId() != null) {
+                    articleTagDOList.set(i, this.articleTagRepository.findFirstByIdAndDelete(articleTagDOList.get(i).getId(), false));
+                }
+            }
         }
         this.articleRepository.save(targetArticleDO);
     }
@@ -178,6 +231,9 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
         }
         if (sourceArticleDO.getCategoryDO() != null) {
             targetArticleDO.setCategoryDO(sourceArticleDO.getCategoryDO());
+        }
+        if (sourceArticleDO.getArticleTagDOList() != null) {
+            targetArticleDO.setArticleTagDOList(sourceArticleDO.getArticleTagDOList());
         }
     }
 
