@@ -42,6 +42,9 @@ public class UserServiceImpl implements UserService {
     @CacheEvict(allEntries = true)
     @Override
     public void updateUserPassword(String oldPassword, String newPassword, String username) {
+        if (StringUtils.isEmpty(oldPassword) || StringUtils.isEmpty(newPassword)) {
+            throw new RequestParamErrorException("参数有误。");
+        }
         UserDO userDO = this.userRepository.findFirstByUsername(username);
         if (userDO == null) {
             throw new ResourceNotFoundException("该用户不存在。");
