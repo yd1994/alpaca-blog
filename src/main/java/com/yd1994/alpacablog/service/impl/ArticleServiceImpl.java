@@ -170,6 +170,14 @@ public class ArticleServiceImpl extends BaseServiceImpl<ArticleDO> implements Ar
             CategoryDO categoryDO = this.categoryRepository.findFirstByIdAndDelete(articleDO.getCategoryDO().getId(), false);
             articleDO.setCategoryDO(categoryDO);
         }
+        if (articleDO.getArticleTagDOList() != null) {
+            List<ArticleTagDO> articleTagDOList = articleDO.getArticleTagDOList();
+            for (int i = 0; i < articleTagDOList.size(); i++) {
+                if (articleTagDOList.get(i).getId() != null) {
+                    articleTagDOList.set(i, this.articleTagRepository.findFirstByIdAndDelete(articleTagDOList.get(i).getId(), false));
+                }
+            }
+        }
         this.articleRepository.saveAndFlush(articleDO);
     }
 
